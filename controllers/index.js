@@ -1,49 +1,62 @@
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
+class Canvas {
+    constructor(element) {
+        this.element = element;
+        this.ctx = element.getContext('2d');
+        this.text = '';
+        this.dirty = true;
+        this.bgColor = null;
+        this.image = '';
+
+        this.ctx.font = 'bold 48px sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillStyle = '#000';
+    }
+}
+
 const inputImage = document.getElementById('input');
 const inputLabel = document.getElementById('input-label');
 const inputColor = document.getElementById('input-color');
 const inputText = document.getElementById('input-text');
 const buttons = document.getElementById('buttons');
 const galleryWindow = document.getElementById('galleryWindow');
-const image = new Image();
-let imageData = '';
 
 requestAnimationFrame(drawCanvas);
 
-let matrix = [1, 0, 0, 1, 0, 0];
-let scale = 1;
-const pos = { x: 0, y: 0 };
-let dirty = true;
-const mouse = {x: 0, y: 0, oldX: 0, oldY: 0, dragging: false};
-let bgColor = null;
-let text = '';
+const canvas = new Canvas(document.getElementById('canvas'));
+const image = {
+    x: 0,
+    y: 0,
+    scale: 1,
+    data: new Image()
+};
+const mouse = {
+    x: 0,
+    y: 0,
+    oldX: 0,
+    oldY: 0,
+    dragging: false
+};
 
-canvas.addEventListener('mousemove', mouseEvent, {passive: true});
-canvas.addEventListener('mousedown', mouseEvent, {passive: true});
-canvas.addEventListener('mouseup', mouseEvent, {passive: true});
-canvas.addEventListener('mouseout', mouseEvent, {passive: true});
-
-canvas.addEventListener('wheel', mouseWheelEvent, {passive: false});
-
-// canvas.addEventListener('touchstart', mouseEvent);
-// canvas.addEventListener('touchmove', mouseEvent);
-// canvas.addEventListener('touchend', mouseEvent);
+canvas.element.addEventListener('mousemove', mouseEvent, {passive: true});
+canvas.element.addEventListener('mousedown', mouseEvent, {passive: true});
+canvas.element.addEventListener('mouseup', mouseEvent, {passive: true});
+canvas.element.addEventListener('mouseout', mouseEvent, {passive: true});
+canvas.element.addEventListener('wheel', mouseWheelEvent, {passive: false});
 
 inputImage.onchange = function() {
     hideInputLabel(this.files[0]);
 };
 
 inputColor.onchange = function(e) {
-    bgColor = e.target.value;
-    if (dirty) update();
-    dirty = true;
+    canvas.bgColor = e.target.value;
+    if (canvas.dirty) update();
+    canvas.dirty = true;
 };
 
 inputText.oninput = function(e) {
-    text = e.target.value;
-    if (dirty) update();
-    dirty = true;
+    canvas.text = e.target.value;
+    if (canvas.dirty) update();
+    canvas.dirty = true;
 };
 
 inputLabel.ondrop = function(e) {
@@ -67,38 +80,35 @@ document.onpaste = function(e){
     hideInputLabel(file);
 };
 
+function centerImage() {
+
+}
+
 function update() {
-    dirty = false;
-    matrix[3] = matrix[0] = scale;
-    matrix[2] = matrix[1] = 0;
-    matrix[4] = pos.x;
-    matrix[5] = pos.y;
-    if (bgColor !== null) {
-        ctx.fillStyle = bgColor;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    canvas.dirty = false;
+    if (canvas.bgColor !== null) {
+        canvas.ctx.fillStyle = canvas.bgColor;
+        canvas.ctx.fillRect(0, 0, canvas.element.width, canvas.element.height);
     }
 }
 
 function scaleAt(at, amount) {
-    if (dirty) update();
-    scale *= amount;
-    pos.x = at.x - (at.x - pos.x) * amount;
-    pos.y = at.y - (at.y - pos.y) * amount;
-    dirty = true;
+    if (canvas.dirty) update();
+    image.scale *= amount;
+    image.x = at.x - (at.x - image.x) * amount;
+    image.y = at.y - (at.y - image.y) * amount;
+    canvas.dirty = true;
 }
 
 function drawCanvas() {
-    if (dirty) {
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if (dirty) update();
-        ctx.setTransform(matrix[0], matrix[1], matrix[2], matrix[3], matrix[4], matrix[5]);
-        ctx.drawImage(image, 0, 0);
-        ctx.resetTransform();
-        ctx.font = 'bold 48px sans-serif';
-        ctx.fillStyle = '#000';
-        ctx.textAlign = 'center';
-        ctx.fillText(text, canvas.width / 2, canvas.height - 40);
+    if (canvas.dirty) {
+        canvas.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        canvas.ctx.clearRect(0, 0, canvas.element.width, canvas.element.height);
+        if (canvas.dirty) update();
+        canvas.ctx.setTransform(image.scale, 0, 0, image.scale, image.x, image.y);
+        canvas.ctx.drawImage(image.data, 0, 0);
+        canvas.ctx.resetTransform();
+        canvas.ctx.fillText(canvas.text, canvas.element.width / 2, canvas.element.height - 40);
     }
     requestAnimationFrame(drawCanvas);
 }
@@ -113,10 +123,10 @@ function mouseEvent(e) {
     mouse.x = e.offsetX;
     mouse.y = e.offsetY
     if (mouse.dragging) {
-        if (dirty) update();
-        pos.x += mouse.x - mouse.oldX;
-        pos.y += mouse.y - mouse.oldY;
-        dirty = true;
+        if (canvas.dirty) update();
+        image.x += mouse.x - mouse.oldX;
+        image.y += mouse.y - mouse.oldY;
+        canvas.dirty = true;
     }
 }
 
@@ -125,16 +135,16 @@ function mouseWheelEvent(e) {
     const y = e.offsetY;
     if (e.deltaY < 0) scaleAt({x, y}, 1.1);
     else {
-        if (scale < 0.04) scale = 0.04;
+        if (image.scale < 0.04) image.scale = 0.04;
         scaleAt({x, y}, 1 / 1.1);
     }
     e.preventDefault();
 }
 
-function download(imageData) {
+function download() {
     const link = document.createElement('a');
     link.download = 'image512x512.png';
-    link.href = imageData;
+    link.href = canvas.image;
     link.click();
 }
 
@@ -142,16 +152,16 @@ function closeWindow() {
     galleryWindow.style.display = 'none';
 }
 
-function showGalleryWindow(imageData) {
+function showGalleryWindow() {
     const gwImage = document.getElementById('gw-img');
-    gwImage.src = imageData;
+    gwImage.src = canvas.image;
     galleryWindow.style.display = 'flex';
 }
 
 function onSubmitClick() {
-    imageData = canvas.toDataURL();
-    download(imageData);
-    showGalleryWindow(imageData);
+    canvas.image = canvas.element.toDataURL();
+    download();
+    showGalleryWindow();
 }
 
 function hideInputLabel(imageFile) {
@@ -165,20 +175,20 @@ function hideInputLabel(imageFile) {
     }
 
     inputLabel.style.display = 'none';
-    canvas.style.display = 'flex';
+    canvas.element.style.display = 'flex';
     buttons.style.display = 'flex';
-    image.onload = () => {
-        ctx.drawImage(image, 0, 0);
-        canvas.elementFromPoint(0, 0).click();
+    image.data.onload = () => {
+        canvas.ctx.drawImage(image.data, 0, 0);
+        canvas.element.elementFromPoint(0, 0).click();
     };
-    image.src = URL.createObjectURL(imageFile);
+    image.data.src = URL.createObjectURL(imageFile);
 }
 
 async function addToGallery() {
     closeWindow();
     const sticker = {
         id: Date.now(),
-        data: imageData
+        data: canvas.image
     };
     await fetch('/api/stickers', {
         method: 'POST',
