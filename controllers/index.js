@@ -1,5 +1,7 @@
 class Canvas {
     constructor(element) {
+        this.width = 512;
+        this.height = 512;
         this.element = element;
         this.ctx = element.getContext('2d');
         this.text = '';
@@ -80,18 +82,6 @@ document.onpaste = function(e){
     hideInputLabel(file);
 };
 
-function centerImage() {
-
-}
-
-function update() {
-    canvas.dirty = false;
-    if (canvas.bgColor !== null) {
-        canvas.ctx.fillStyle = canvas.bgColor;
-        canvas.ctx.fillRect(0, 0, canvas.element.width, canvas.element.height);
-    }
-}
-
 function scaleAt(at, amount) {
     if (canvas.dirty) update();
     image.scale *= amount;
@@ -105,12 +95,70 @@ function drawCanvas() {
         canvas.ctx.setTransform(1, 0, 0, 1, 0, 0);
         canvas.ctx.clearRect(0, 0, canvas.element.width, canvas.element.height);
         if (canvas.dirty) update();
+        tryAnchor();
         canvas.ctx.setTransform(image.scale, 0, 0, image.scale, image.x, image.y);
         canvas.ctx.drawImage(image.data, 0, 0);
         canvas.ctx.resetTransform();
         canvas.ctx.fillText(canvas.text, canvas.element.width / 2, canvas.element.height - 40);
     }
     requestAnimationFrame(drawCanvas);
+}
+
+function drawX(x, y) {
+    canvas.ctx.beginPath();
+
+    canvas.ctx.moveTo(x - 20, y - 20);
+    canvas.ctx.lineTo(x + 20, y + 20);
+    canvas.ctx.stroke();
+
+    canvas.ctx.moveTo(x + 20, y - 20);
+    canvas.ctx.lineTo(x - 20, y + 20);
+    canvas.ctx.stroke();
+}
+
+function getDistance(id, x1, y1, x2, y2) {
+    return {
+        id: id,
+        distance: Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2),
+    };
+}
+
+function tryAnchor() {
+    const range = 5;
+    const imageWidth = image.data.width * image.scale;
+    const imageHeight = image.data.height * image.scale;
+    const anchors = [
+        getDistance("topLeft", image.x, image.y, 0, 0),
+        getDistance("topRight", image.x + imageWidth, image.y, canvas.width, 0),
+        getDistance("bottomLeft", image.x, image.y + imageHeight, 0, canvas.height),
+        getDistance("bottomRight", image.x + imageWidth, image.y + imageHeight,
+            canvas.width, canvas.height)
+    ];
+    const min = anchors.reduce((prev, current) =>
+        (prev.distance < current.distance) ? prev : current);
+
+    if (min.distance >= range) return;
+
+    if (min.id === "topLeft") {
+        image.x = 0;
+        image.y = 0;
+    } else if (min.id === "topRight") {
+        image.x = canvas.width - imageWidth;
+        image.y = 0;
+    } else if (min.id === "bottomLeft") {
+        image.x = 0;
+        image.y = canvas.height - imageHeight;
+    } else if (min.id === "bottomRight") {
+        image.x = canvas.width - imageWidth;
+        image.y = canvas.height - imageHeight;
+    }
+}
+
+function update() {
+    canvas.dirty = false;
+    if (canvas.bgColor === null) return;
+    canvas.ctx.fillStyle = canvas.bgColor;
+    canvas.ctx.fillRect(0, 0, canvas.element.width, canvas.element.height);
 }
 
 function mouseEvent(e) {
