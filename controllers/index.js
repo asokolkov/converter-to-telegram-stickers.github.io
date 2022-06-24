@@ -1,21 +1,3 @@
-class Canvas {
-    constructor(element) {
-        this.width = 512;
-        this.height = 512;
-        this.element = element;
-        this.ctx = element.getContext('2d');
-        this.text = '';
-        this.dirty = true;
-        this.bgColor = null;
-        this.image = '';
-        this.shiftPressed = false;
-
-        this.ctx.font = 'bold 48px sans-serif';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillStyle = '#000';
-    }
-}
-
 const inputImage = document.getElementById('input');
 const inputLabel = document.getElementById('input-label');
 const inputColor = document.getElementById('input-color');
@@ -25,7 +7,17 @@ const galleryWindow = document.getElementById('galleryWindow');
 
 requestAnimationFrame(drawCanvas);
 
-const canvas = new Canvas(document.getElementById('canvas'));
+const canvas = {
+    width: 512,
+    height: 512,
+    element: document.getElementById('canvas'),
+    ctx: this.element.getContext('2d'),
+    text: '',
+    dirty: true,
+    bgColor: null,
+    image: '',
+    shiftPressed: false
+}
 const image = {
     x: 0,
     y: 0,
@@ -39,6 +31,10 @@ const mouse = {
     oldY: 0,
     dragging: false
 };
+
+canvas.ctx.font = 'bold 48px sans-serif';
+canvas.ctx.textAlign = 'center';
+canvas.ctx.fillStyle = '#000';
 
 canvas.element.addEventListener('mousemove', mouseEvent, {passive: true});
 canvas.element.addEventListener('mousedown', mouseEvent, {passive: true});
