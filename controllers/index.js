@@ -8,6 +8,7 @@ class Canvas {
         this.dirty = true;
         this.bgColor = null;
         this.image = '';
+        this.shiftPressed = false;
 
         this.ctx.font = 'bold 48px sans-serif';
         this.ctx.textAlign = 'center';
@@ -95,33 +96,13 @@ function drawCanvas() {
         canvas.ctx.setTransform(1, 0, 0, 1, 0, 0);
         canvas.ctx.clearRect(0, 0, canvas.element.width, canvas.element.height);
         if (canvas.dirty) update();
-        tryAnchor();
+        if (canvas.shiftPressed) tryAnchor();
         canvas.ctx.setTransform(image.scale, 0, 0, image.scale, image.x, image.y);
         canvas.ctx.drawImage(image.data, 0, 0);
-        if (mouse.dragging) drawCenter();
         canvas.ctx.resetTransform();
         canvas.ctx.fillText(canvas.text, canvas.element.width / 2, canvas.element.height - 40);
     }
     requestAnimationFrame(drawCanvas);
-}
-
-function drawCenter() {
-    canvas.ctx.beginPath();
-
-    const imageCenterX = image.data.width / 2;
-    const imageCenterY = image.data.height / 2;
-    canvas.ctx.lineWidth = 10;
-    canvas.ctx.strokeStyle = '#ff0000';
-
-    canvas.ctx.moveTo(imageCenterX, imageCenterY - 20);
-    canvas.ctx.lineTo(imageCenterX, imageCenterY + 20);
-    canvas.ctx.stroke();
-
-    canvas.ctx.moveTo(imageCenterX - 20, imageCenterY);
-    canvas.ctx.lineTo(imageCenterX + 20, imageCenterY);
-    canvas.ctx.stroke();
-
-    canvas.ctx.closePath();
 }
 
 function tryAnchor() {
@@ -141,7 +122,7 @@ function tryAnchor() {
         centerY: canvasCenterY - imageCenterY
     };
     for (const [side, distance] of Object.entries(distances)) {
-        if (!(-range < distance && distance < range)) continue;
+        if (-range >= distance || distance >= range) continue;
         if (side === 'left') image.x = 0;
         else if (side === 'top') image.y = 0;
         else if (side === 'right') image.x = canvas.width - imageWidth;
@@ -159,6 +140,7 @@ function update() {
 }
 
 function mouseEvent(e) {
+    canvas.shiftPressed = e.shiftKey;
     if (e.type === 'mousedown' || e.type === 'touchstart')
         mouse.dragging = true;
     if (e.type === 'mouseup' || e.type === 'mouseout' || e.type === 'touchend')
