@@ -98,59 +98,56 @@ function drawCanvas() {
         tryAnchor();
         canvas.ctx.setTransform(image.scale, 0, 0, image.scale, image.x, image.y);
         canvas.ctx.drawImage(image.data, 0, 0);
+        if (mouse.dragging) drawCenter();
         canvas.ctx.resetTransform();
         canvas.ctx.fillText(canvas.text, canvas.element.width / 2, canvas.element.height - 40);
     }
     requestAnimationFrame(drawCanvas);
 }
 
-function drawX(x, y) {
+function drawCenter() {
     canvas.ctx.beginPath();
 
-    canvas.ctx.moveTo(x - 20, y - 20);
-    canvas.ctx.lineTo(x + 20, y + 20);
+    const imageCenterX = image.data.width / 2;
+    const imageCenterY = image.data.height / 2;
+    canvas.ctx.lineWidth = 10;
+    canvas.ctx.strokeStyle = '#ff0000';
+
+    canvas.ctx.moveTo(imageCenterX, imageCenterY - 20);
+    canvas.ctx.lineTo(imageCenterX, imageCenterY + 20);
     canvas.ctx.stroke();
 
-    canvas.ctx.moveTo(x + 20, y - 20);
-    canvas.ctx.lineTo(x - 20, y + 20);
+    canvas.ctx.moveTo(imageCenterX - 20, imageCenterY);
+    canvas.ctx.lineTo(imageCenterX + 20, imageCenterY);
     canvas.ctx.stroke();
-}
 
-function getDistance(id, x1, y1, x2, y2) {
-    return {
-        id: id,
-        distance: Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2),
-    };
+    canvas.ctx.closePath();
 }
 
 function tryAnchor() {
     const range = 5;
     const imageWidth = image.data.width * image.scale;
     const imageHeight = image.data.height * image.scale;
-    const anchors = [
-        getDistance("topLeft", image.x, image.y, 0, 0),
-        getDistance("topRight", image.x + imageWidth, image.y, canvas.width, 0),
-        getDistance("bottomLeft", image.x, image.y + imageHeight, 0, canvas.height),
-        getDistance("bottomRight", image.x + imageWidth, image.y + imageHeight,
-            canvas.width, canvas.height)
-    ];
-    const min = anchors.reduce((prev, current) =>
-        (prev.distance < current.distance) ? prev : current);
-
-    if (min.distance >= range) return;
-
-    if (min.id === "topLeft") {
-        image.x = 0;
-        image.y = 0;
-    } else if (min.id === "topRight") {
-        image.x = canvas.width - imageWidth;
-        image.y = 0;
-    } else if (min.id === "bottomLeft") {
-        image.x = 0;
-        image.y = canvas.height - imageHeight;
-    } else if (min.id === "bottomRight") {
-        image.x = canvas.width - imageWidth;
-        image.y = canvas.height - imageHeight;
+    const canvasCenterX = canvas.width / 2;
+    const canvasCenterY = canvas.height / 2;
+    const imageCenterX = image.x + imageWidth / 2;
+    const imageCenterY = image.y + imageHeight / 2;
+    const distances = {
+        left: image.x,
+        top: image.y,
+        right: canvas.width - (image.x + imageWidth),
+        bottom: canvas.height - (image.y + imageHeight),
+        centerX: canvasCenterX - imageCenterX,
+        centerY: canvasCenterY - imageCenterY
+    };
+    for (const [side, distance] of Object.entries(distances)) {
+        if (!(-range < distance && distance < range)) continue;
+        if (side === 'left') image.x = 0;
+        else if (side === 'top') image.y = 0;
+        else if (side === 'right') image.x = canvas.width - imageWidth;
+        else if (side === 'bottom') image.y = canvas.height - imageHeight;
+        else if (side === 'centerX') image.x = canvasCenterX - imageWidth / 2;
+        else if (side === 'centerY') image.y = canvasCenterY - imageHeight / 2;
     }
 }
 
