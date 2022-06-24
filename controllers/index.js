@@ -5,23 +5,23 @@ const inputText = document.getElementById('input-text');
 const buttons = document.getElementById('buttons');
 const galleryWindow = document.getElementById('galleryWindow');
 
-requestAnimationFrame(drawCanvas);
-
 const canvas = {
     width: 512,
     height: 512,
     element: document.getElementById('canvas'),
-    ctx: this.element.getContext('2d'),
+    ctx: null,
     text: '',
     dirty: true,
     bgColor: null,
     image: '',
-    shiftPressed: false
+    shiftPressed: false,
+    scale: 1
 }
+canvas.ctx = canvas.element.getContext('2d');
+const images = [];
 const image = {
     x: 0,
     y: 0,
-    scale: 1,
     data: new Image()
 };
 const mouse = {
@@ -79,9 +79,11 @@ document.onpaste = function(e){
     hideInputLabel(file);
 };
 
+requestAnimationFrame(drawCanvas);
+
 function scaleAt(at, amount) {
     if (canvas.dirty) update();
-    image.scale *= amount;
+    canvas.scale *= amount;
     image.x = at.x - (at.x - image.x) * amount;
     image.y = at.y - (at.y - image.y) * amount;
     canvas.dirty = true;
@@ -93,7 +95,7 @@ function drawCanvas() {
         canvas.ctx.clearRect(0, 0, canvas.element.width, canvas.element.height);
         if (canvas.dirty) update();
         if (canvas.shiftPressed) tryAnchor();
-        canvas.ctx.setTransform(image.scale, 0, 0, image.scale, image.x, image.y);
+        canvas.ctx.setTransform(canvas.scale, 0, 0, canvas.scale, image.x, image.y);
         canvas.ctx.drawImage(image.data, 0, 0);
         canvas.ctx.resetTransform();
         canvas.ctx.fillText(canvas.text, canvas.element.width / 2, canvas.element.height - 40);
@@ -103,8 +105,8 @@ function drawCanvas() {
 
 function tryAnchor() {
     const range = 5;
-    const imageWidth = image.data.width * image.scale;
-    const imageHeight = image.data.height * image.scale;
+    const imageWidth = image.data.width * canvas.scale;
+    const imageHeight = image.data.height * canvas.scale;
     const canvasCenterX = canvas.width / 2;
     const canvasCenterY = canvas.height / 2;
     const imageCenterX = image.x + imageWidth / 2;
@@ -158,7 +160,7 @@ function mouseWheelEvent(e) {
     const y = e.offsetY;
     if (e.deltaY < 0) scaleAt({x, y}, 1.1);
     else {
-        if (image.scale < 0.04) image.scale = 0.04;
+        if (canvas.scale < 0.04) canvas.scale = 0.04;
         scaleAt({x, y}, 1 / 1.1);
     }
     e.preventDefault();
