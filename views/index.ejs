@@ -6,9 +6,9 @@
 </head>
 <body>
 
-<h1>
-    <a href="">TSFM</a>
-</h1>
+<!--<h1>-->
+<!--    <a href="">TSFM</a>-->
+<!--</h1>-->
 
 <h3>
     <a href="/gallery">Gallery</a>
@@ -30,10 +30,10 @@
     <div class="block">
         <div class="block-i">
             <label id="input-label">
-                <input id="input" type="file">
+                <input id="input" type="file" multiple="multiple">
                 <span class="text text-type-1">Choose image<br>or drag it here</span>
             </label>
-            <canvas id="canvas" width="512px" height="512px"></canvas>
+            <div id="canvas"></div>
         </div>
     </div>
     <div id="buttons">
@@ -46,15 +46,13 @@
         <button id="reload" class="b-e" onclick="document.location.reload();" title="Reload">
             <img class="b-i" src="../images/reload.png" alt="" draggable="false">
         </button>
-        <button id="center" class="b-e" onclick="centerImage()">
-            <img class="b-i" src="../images/crossDark.png" alt="" draggable="false">
-        </button>
         <label class="input-text-class b-e">
-            <input id="input-text" type="text" placeholder="Enter text" maxlength="12">
+            <input id="input-text" type="text" placeholder="Enter text">
         </label>
     </div>
 </section>
 
+<script src="https://unpkg.com/konva@8/konva.min.js"></script>
 <script src="../controllers/index.js"></script>
 
 </body>

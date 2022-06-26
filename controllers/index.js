@@ -5,63 +5,78 @@ const inputText = document.getElementById('input-text');
 const buttons = document.getElementById('buttons');
 const galleryWindow = document.getElementById('galleryWindow');
 
-const canvas = {
+const scale = {
+    step: 1.1,
+    counter: 0,
+    max: 45,
+    min: -110
+};
+let imageData = '';
+
+const stage = new Konva.Stage({
+    container: 'canvas',
     width: 512,
-    height: 512,
-    element: document.getElementById('canvas'),
-    ctx: null,
-    text: '',
-    dirty: true,
-    bgColor: null,
-    image: '',
-    shiftPressed: false,
-    scale: 1
-}
-canvas.ctx = canvas.element.getContext('2d');
-const images = [];
-const image = {
-    x: 0,
-    y: 0,
-    data: new Image()
-};
-const mouse = {
-    x: 0,
-    y: 0,
-    oldX: 0,
-    oldY: 0,
-    dragging: false
-};
+    height: 512
+});
 
-canvas.ctx.font = 'bold 48px sans-serif';
-canvas.ctx.textAlign = 'center';
-canvas.ctx.fillStyle = '#000';
+const staticLayer = new Konva.Layer();
+const activeLayer = new Konva.Layer();
+stage.add(staticLayer, activeLayer);
 
-canvas.element.addEventListener('mousemove', mouseEvent, {passive: true});
-canvas.element.addEventListener('mousedown', mouseEvent, {passive: true});
-canvas.element.addEventListener('mouseup', mouseEvent, {passive: true});
-canvas.element.addEventListener('mouseout', mouseEvent, {passive: true});
-canvas.element.addEventListener('wheel', mouseWheelEvent, {passive: false});
+const background = new Konva.Rect({
+    x: -5,
+    y: -5,
+    width: 50000,
+    height: 50000,
+    listening: false
+});
+staticLayer.add(background);
+
+const text = new Konva.Text({
+    draggable: true,
+    fontSize: 65,
+    width: 450
+});
+staticLayer.add(text);
+
+stage.on('wheel', e => {
+    e.evt.preventDefault();
+
+    const oldScale = stage.scaleX();
+    const pointer = stage.getPointerPosition();
+    let mousePointTo = {
+        x: (pointer.x - stage.x()) / oldScale,
+        y: (pointer.y - stage.y()) / oldScale,
+    };
+
+    let direction = e.evt.deltaY < 0 ? -1 : 1;
+    if (scale.counter + direction > scale.max || scale.counter + direction < scale.min) return;
+    scale.counter += direction;
+
+    const newScale = direction < 0 ? oldScale * scale.step : oldScale / scale.step;
+    stage.scale({ x: newScale, y: newScale });
+    stage.position({
+        x: pointer.x - mousePointTo.x * newScale,
+        y: pointer.y - mousePointTo.y * newScale,
+    });
+
+    background.absolutePosition({ x: -5, y: -5 });
+});
 
 inputImage.onchange = function() {
-    hideInputLabel(this.files[0]);
-};
-
-inputColor.onchange = function(e) {
-    canvas.bgColor = e.target.value;
-    if (canvas.dirty) update();
-    canvas.dirty = true;
-};
-
-inputText.oninput = function(e) {
-    canvas.text = e.target.value;
-    if (canvas.dirty) update();
-    canvas.dirty = true;
+    addFiles(this.files);
 };
 
 inputLabel.ondrop = function(e) {
     e.preventDefault();
-    inputImage.files = e.dataTransfer.files;
-    hideInputLabel(inputImage.files[0]);
+    addFiles(e.dataTransfer.files);
+};
+
+document.onpaste = function(e){
+    const files = Object.values(e.clipboardData.items)
+        .filter(element => element.kind === 'file')
+        .map((element) => element.getAsFile());
+    addFiles(files);
 };
 
 inputLabel.ondragover = function(e) {
@@ -74,146 +89,75 @@ inputLabel.ondragleave = function(e) {
     this.classList.remove('dragover');
 };
 
-document.onpaste = function(e){
-    const file = e.clipboardData.items[0].getAsFile();
-    hideInputLabel(file);
-};
-
-requestAnimationFrame(drawCanvas);
-
-function scaleAt(at, amount) {
-    if (canvas.dirty) update();
-    canvas.scale *= amount;
-    image.x = at.x - (at.x - image.x) * amount;
-    image.y = at.y - (at.y - image.y) * amount;
-    canvas.dirty = true;
+inputText.oninput = function (e) {
+    text.setText(e.target.value);
 }
 
-function drawCanvas() {
-    if (canvas.dirty) {
-        canvas.ctx.setTransform(1, 0, 0, 1, 0, 0);
-        canvas.ctx.clearRect(0, 0, canvas.element.width, canvas.element.height);
-        if (canvas.dirty) update();
-        if (canvas.shiftPressed) tryAnchor();
-        canvas.ctx.setTransform(canvas.scale, 0, 0, canvas.scale, image.x, image.y);
-        canvas.ctx.drawImage(image.data, 0, 0);
-        canvas.ctx.resetTransform();
-        canvas.ctx.fillText(canvas.text, canvas.element.width / 2, canvas.element.height - 40);
+inputColor.oninput = function (e) {
+    background.fill(e.target.value);
+}
+
+function addFiles(files) {
+    if (!Array.isArray(files)) files = Object.values(files);
+    for (const file of files) {
+        if (!isValidFileFormat(file)) continue;
+
+        const imageObj = new Image();
+        imageObj.onload = function () {
+            const image = new Konva.Image({
+                image: imageObj,
+                draggable: true
+            });
+
+            image.on('dragstart dragend', e => {
+                const destinationLayer = (e.type === 'dragstart') ? activeLayer : staticLayer;
+                image.moveTo(destinationLayer);
+                image.moveToTop();
+            });
+
+            staticLayer.add(image);
+        };
+        imageObj.src = URL.createObjectURL(file);
     }
-    requestAnimationFrame(drawCanvas);
+
+    inputLabel.style.display = 'none';
+    document.getElementById('canvas').style.display = 'flex';
+    buttons.style.display = 'flex';
 }
 
-function tryAnchor() {
-    const range = 5;
-    const imageWidth = image.data.width * canvas.scale;
-    const imageHeight = image.data.height * canvas.scale;
-    const canvasCenterX = canvas.width / 2;
-    const canvasCenterY = canvas.height / 2;
-    const imageCenterX = image.x + imageWidth / 2;
-    const imageCenterY = image.y + imageHeight / 2;
-    const distances = {
-        left: image.x,
-        top: image.y,
-        right: canvas.width - (image.x + imageWidth),
-        bottom: canvas.height - (image.y + imageHeight),
-        centerX: canvasCenterX - imageCenterX,
-        centerY: canvasCenterY - imageCenterY
-    };
-    for (const [side, distance] of Object.entries(distances)) {
-        if (-range >= distance || distance >= range) continue;
-        if (side === 'left') image.x = 0;
-        else if (side === 'top') image.y = 0;
-        else if (side === 'right') image.x = canvas.width - imageWidth;
-        else if (side === 'bottom') image.y = canvas.height - imageHeight;
-        else if (side === 'centerX') image.x = canvasCenterX - imageWidth / 2;
-        else if (side === 'centerY') image.y = canvasCenterY - imageHeight / 2;
-    }
+function isValidFileFormat(file) {
+    const fileFormat = file.name.split('.').pop();
+    return fileFormat === 'png' || fileFormat === 'jpg' || fileFormat === 'jpeg';
 }
 
-function update() {
-    canvas.dirty = false;
-    if (canvas.bgColor === null) return;
-    canvas.ctx.fillStyle = canvas.bgColor;
-    canvas.ctx.fillRect(0, 0, canvas.element.width, canvas.element.height);
-}
-
-function mouseEvent(e) {
-    canvas.shiftPressed = e.shiftKey;
-    if (e.type === 'mousedown' || e.type === 'touchstart')
-        mouse.dragging = true;
-    if (e.type === 'mouseup' || e.type === 'mouseout' || e.type === 'touchend')
-        mouse.dragging = false;
-    mouse.oldX = mouse.x;
-    mouse.oldY = mouse.y;
-    mouse.x = e.offsetX;
-    mouse.y = e.offsetY
-    if (mouse.dragging) {
-        if (canvas.dirty) update();
-        image.x += mouse.x - mouse.oldX;
-        image.y += mouse.y - mouse.oldY;
-        canvas.dirty = true;
-    }
-}
-
-function mouseWheelEvent(e) {
-    const x = e.offsetX;
-    const y = e.offsetY;
-    if (e.deltaY < 0) scaleAt({x, y}, 1.1);
-    else {
-        if (canvas.scale < 0.04) canvas.scale = 0.04;
-        scaleAt({x, y}, 1 / 1.1);
-    }
-    e.preventDefault();
-}
-
-function download() {
+function download(fileName) {
     const link = document.createElement('a');
-    link.download = 'image512x512.png';
-    link.href = canvas.image;
+    link.download = fileName;
+    link.href = imageData;
     link.click();
+}
+
+function onSubmitClick() {
+    imageData = stage.toDataURL({pixelRatio: 1});
+    download('image512x512.png');
+    showGalleryWindow();
+}
+
+function showGalleryWindow() {
+    const gwImage = document.getElementById('gw-img');
+    gwImage.src = imageData;
+    galleryWindow.style.display = 'flex';
 }
 
 function closeWindow() {
     galleryWindow.style.display = 'none';
 }
 
-function showGalleryWindow() {
-    const gwImage = document.getElementById('gw-img');
-    gwImage.src = canvas.image;
-    galleryWindow.style.display = 'flex';
-}
-
-function onSubmitClick() {
-    canvas.image = canvas.element.toDataURL();
-    download();
-    showGalleryWindow();
-}
-
-function hideInputLabel(imageFile) {
-    const fileFormat = imageFile.name.split('.').pop();
-    const correctImageFormat = fileFormat === 'png' ||
-        fileFormat === 'jpg' || fileFormat === 'jpeg';
-
-    if (!correctImageFormat) {
-        alert('Wrong file type. Try again.');
-        return;
-    }
-
-    inputLabel.style.display = 'none';
-    canvas.element.style.display = 'flex';
-    buttons.style.display = 'flex';
-    image.data.onload = () => {
-        canvas.ctx.drawImage(image.data, 0, 0);
-        canvas.element.elementFromPoint(0, 0).click();
-    };
-    image.data.src = URL.createObjectURL(imageFile);
-}
-
 async function addToGallery() {
     closeWindow();
     const sticker = {
         id: Date.now(),
-        data: canvas.image
+        data: imageData
     };
     await fetch('/api/stickers', {
         method: 'POST',

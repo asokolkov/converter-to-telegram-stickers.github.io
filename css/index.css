@@ -3,7 +3,6 @@ body {
     margin: 0;
     padding: 0;
     height: 100vh;
-    flex-flow: column;
     background-color: #f8adc3;
 }
 
@@ -42,16 +41,15 @@ a:hover {
 }
 
 section {
-    display: block;
-    margin: 0 auto;
+    display: flex;
+    margin: auto auto auto 50px;
 }
 
 .block {
     z-index: 500;
     display: flex;
-    width: 400px;
-    height: 400px;
-    margin-bottom: 20px;
+    width: 612px;
+    height: 612px;
     background-color: #524A4E;
 }
 
@@ -62,8 +60,8 @@ section {
 .block-i {
     display: flex;
     margin: auto;
-    width: 80%;
-    height: 80%;
+    width: 512px;
+    height: 512px;
     background-color: #f8adc3;
 }
 
@@ -99,17 +97,14 @@ section {
 
 #buttons {
     display: none;
-    position: absolute;
-    left: 50%;
-    transform: translate(-50%, 0);
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-flow: column;
+    margin: 0 auto auto 50px;
 }
 
 .b-e {
     width: 55px;
     height: 55px;
-    margin: auto 10px;
+    margin: 0 auto 10px 0;
 }
 
 button.b-e.close {
