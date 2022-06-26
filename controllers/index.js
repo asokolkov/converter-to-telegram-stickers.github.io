@@ -35,9 +35,21 @@ staticLayer.add(background);
 const text = new Konva.Text({
     draggable: true,
     fontSize: 65,
-    width: 450
+    width: 450,
+    fill: 'white',
+    stroke: 'black',
+    strokeWidth: 5
 });
 staticLayer.add(text);
+
+const originalFillStroke = Konva.Context.prototype.fillStrokeShape;
+Konva.Context.prototype.fillStrokeShape = function(shape) {
+    if (shape instanceof Konva.Text) {
+        if (shape.getStrokeEnabled()) this._stroke(shape);
+        if (shape.getFillEnabled()) this._fill(shape);
+    }
+    else originalFillStroke.call(this, shape);
+};
 
 stage.on('wheel', e => {
     e.evt.preventDefault();
@@ -113,6 +125,7 @@ function addFiles(files) {
                 const destinationLayer = (e.type === 'dragstart') ? activeLayer : staticLayer;
                 image.moveTo(destinationLayer);
                 image.moveToTop();
+                text.moveToTop();
             });
 
             staticLayer.add(image);
