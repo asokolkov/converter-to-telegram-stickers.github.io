@@ -8,7 +8,6 @@ const galleryWindow = document.getElementById('galleryWindow');
 
 const stageWidth = 512;
 const stageHeight = 512;
-let shiftPressed = false;
 let imageData = '';
 const anchorAxes = new Set();
 anchorAxes.add({axis: 'x', position: 0});
@@ -40,7 +39,8 @@ const tr = new Konva.Transformer({
     anchorFill: 'yellow',
     anchorSize: 20,
     borderStroke: 'green',
-    borderDash: [3, 3]
+    borderDash: [3, 3],
+    rotationSnaps: [0, 45, 90, 135, 180, 225, 270, 315]
 });
 layer.add(tr);
 
@@ -187,11 +187,11 @@ inputText.oninput = function (e) {
     const textSymbols = text.getAttr('text');
     if (textSymbols) layer.add(text);
     else text.remove();
-}
+};
 
 inputColor.oninput = function (e) {
     background.fill(e.target.value);
-}
+};
 
 
 function addToNodes(element) {
