@@ -5,29 +5,37 @@ const inputText = document.getElementById('input-text');
 const buttons = document.getElementById('buttons');
 const galleryWindow = document.getElementById('galleryWindow');
 
-const scale = {
-    step: 1.1,
-    counter: 0,
-    max: 45,
-    min: -110
-};
-let imageData = '';
-
 const stage = new Konva.Stage({
     container: 'canvas',
     width: 512,
     height: 512
 });
 
+let shiftPressed = false;
+const scale = {
+    step: 1.1,
+    counter: 1,
+    max: 45,
+    min: -110
+};
+let imageData = '';
+const anchorAxes = new Set();
+anchorAxes.add({axis: 'x', position: 0});
+anchorAxes.add({axis: 'y', position: 0});
+anchorAxes.add({axis: 'x', position: stage.width()});
+anchorAxes.add({axis: 'x', position: stage.height()});
+
 const staticLayer = new Konva.Layer();
 const activeLayer = new Konva.Layer();
 stage.add(staticLayer, activeLayer);
 
 const background = new Konva.Rect({
-    x: -5,
-    y: -5,
-    width: 50000,
-    height: 50000,
+    x: 0,
+    y: 0,
+    width: 512,
+    height: 512,
+    stroke: 'black',
+    strokeWidth: 15,
     listening: false
 });
 staticLayer.add(background);
@@ -51,6 +59,18 @@ Konva.Context.prototype.fillStrokeShape = function(shape) {
     else originalFillStroke.call(this, shape);
 };
 
+const horizontalLine = new Konva.Line({
+    points: [-1, 0, 1, 0],
+    stroke: 'red',
+    strokeWidth: 5
+});
+
+const verticalLine = new Konva.Line({
+    points: [0, -1, 0, 1],
+    stroke: 'red',
+    strokeWidth: 5
+});
+
 stage.on('wheel', e => {
     e.evt.preventDefault();
 
@@ -72,8 +92,20 @@ stage.on('wheel', e => {
         y: pointer.y - mousePointTo.y * newScale,
     });
 
-    background.absolutePosition({ x: -5, y: -5 });
+    resizeBackground(direction);
 });
+
+function resizeBackground(direction) {
+    background.absolutePosition({ x: 0, y: 0 });
+    background.setAttrs({
+        width: calcScaledSize(direction, background.width()),
+        height: calcScaledSize(direction, background.height()),
+    });
+}
+
+function calcScaledSize(direction, axis) {
+    return direction > 0 ? axis * scale.step : axis / scale.step
+}
 
 inputImage.onchange = function() {
     addFiles(this.files);
@@ -111,31 +143,46 @@ inputColor.oninput = function (e) {
 
 function addFiles(files) {
     if (!Array.isArray(files)) files = Object.values(files);
-    for (const file of files) {
-        if (!isValidFileFormat(file)) continue;
-
-        const imageObj = new Image();
-        imageObj.onload = function () {
-            const image = new Konva.Image({
-                image: imageObj,
-                draggable: true
-            });
-
-            image.on('dragstart dragend', e => {
-                const destinationLayer = (e.type === 'dragstart') ? activeLayer : staticLayer;
-                image.moveTo(destinationLayer);
-                image.moveToTop();
-                text.moveToTop();
-            });
-
-            staticLayer.add(image);
-        };
-        imageObj.src = URL.createObjectURL(file);
-    }
+    files.forEach(file => {
+        if (isValidFileFormat(file)) addImage(file);
+    });
 
     inputLabel.style.display = 'none';
     document.getElementById('canvas').style.display = 'flex';
     buttons.style.display = 'flex';
+}
+
+function addImage(file) {
+    const imageObj = new Image();
+    imageObj.onload = function () {
+        const image = new Konva.Image({
+            image: imageObj,
+            draggable: true
+        });
+
+        image.on('dragstart dragend', e => {
+            image.moveTo((e.type === 'dragstart') ? activeLayer : staticLayer);
+            image.moveToTop();
+            text.moveToTop();
+        });
+
+        image.on('dragmove', function(e) {
+            if (e.evt.shiftKey) tryAnchor(this);
+        });
+
+        staticLayer.add(image);
+    };
+    imageObj.src = URL.createObjectURL(file);
+}
+
+function tryAnchor(image) {
+    const range = 5;
+    for (const anchor of anchorAxes) {
+        if (anchor.axis === 'x') {
+            const difference1 = image.attrs.x - anchor.position;
+            if (-range < difference1 && difference1 < range) image.attrs.x = anchor.position;
+        }
+    }
 }
 
 function isValidFileFormat(file) {
