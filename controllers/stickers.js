@@ -20,3 +20,12 @@ export const create = (req, res) => {
     })
     res.status(201).json(newSticker);
 };
+
+export const remove = (req, res) => {
+    fs.readFile('./stickers.json', function (err, data) {
+        fs.writeFile('./stickers.json', [], err => {
+            if (err) throw err;
+        });
+    })
+    res.status(202).json(stickers);
+};
