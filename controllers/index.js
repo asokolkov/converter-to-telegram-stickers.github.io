@@ -5,40 +5,42 @@ const inputText = document.getElementById('input-text');
 const buttons = document.getElementById('buttons');
 const galleryWindow = document.getElementById('galleryWindow');
 
+const stageWidth = 512;
+const stageHeight = 512;
+let shiftPressed = false;
+let imageData = '';
+const anchorAxes = new Set();
+anchorAxes.add({axis: 'x', position: 0});
+anchorAxes.add({axis: 'y', position: 0});
+anchorAxes.add({axis: 'x', position: stageWidth});
+anchorAxes.add({axis: 'x', position: stageHeight});
+
 const stage = new Konva.Stage({
     container: 'canvas',
     width: 512,
     height: 512
 });
 
-let shiftPressed = false;
-const scale = {
-    step: 1.1,
-    counter: 1,
-    max: 45,
-    min: -110
-};
-let imageData = '';
-const anchorAxes = new Set();
-anchorAxes.add({axis: 'x', position: 0});
-anchorAxes.add({axis: 'y', position: 0});
-anchorAxes.add({axis: 'x', position: stage.width()});
-anchorAxes.add({axis: 'x', position: stage.height()});
-
-const staticLayer = new Konva.Layer();
-const activeLayer = new Konva.Layer();
-stage.add(staticLayer, activeLayer);
+const layer = new Konva.Layer();
+stage.add(layer);
 
 const background = new Konva.Rect({
-    x: 0,
-    y: 0,
-    width: 512,
-    height: 512,
-    stroke: 'black',
-    strokeWidth: 15,
+    x: -1,
+    y: -1,
+    width: stageWidth + 1,
+    height: stageHeight + 1,
     listening: false
 });
-staticLayer.add(background);
+layer.add(background);
+
+var tr = new Konva.Transformer({
+    anchorStroke: 'red',
+    anchorFill: 'yellow',
+    anchorSize: 20,
+    borderStroke: 'green',
+    borderDash: [3, 3]
+});
+layer.add(tr);
 
 const text = new Konva.Text({
     draggable: true,
@@ -46,9 +48,10 @@ const text = new Konva.Text({
     width: 450,
     fill: 'white',
     stroke: 'black',
-    strokeWidth: 5
+    strokeWidth: 5,
+    name: 'element'
 });
-staticLayer.add(text);
+layer.add(text);
 
 const originalFillStroke = Konva.Context.prototype.fillStrokeShape;
 Konva.Context.prototype.fillStrokeShape = function(shape) {
@@ -71,41 +74,87 @@ const verticalLine = new Konva.Line({
     strokeWidth: 5
 });
 
-stage.on('wheel', e => {
+const selection = new Konva.Rect({
+    fill: 'rgba(0, 0, 255, 0.5)',
+    visible: false,
+});
+layer.add(selection);
+
+
+
+
+
+let x1, y1, x2, y2;
+stage.on('mousedown touchstart', (e) => {
+    if (e.target !== stage) return;
     e.evt.preventDefault();
 
-    const oldScale = stage.scaleX();
-    const pointer = stage.getPointerPosition();
-    let mousePointTo = {
-        x: (pointer.x - stage.x()) / oldScale,
-        y: (pointer.y - stage.y()) / oldScale,
-    };
+    const position = stage.getPointerPosition();
+    x1 = position.x;
+    y1 = position.y;
+    x2 = position.x;
+    y2 = position.y;
 
-    let direction = e.evt.deltaY < 0 ? -1 : 1;
-    if (scale.counter + direction > scale.max || scale.counter + direction < scale.min) return;
-    scale.counter += direction;
-
-    const newScale = direction < 0 ? oldScale * scale.step : oldScale / scale.step;
-    stage.scale({ x: newScale, y: newScale });
-    stage.position({
-        x: pointer.x - mousePointTo.x * newScale,
-        y: pointer.y - mousePointTo.y * newScale,
-    });
-
-    resizeBackground(direction);
+    selection.visible(true);
+    selection.width(0);
+    selection.height(0);
 });
 
-function resizeBackground(direction) {
-    background.absolutePosition({ x: 0, y: 0 });
-    background.setAttrs({
-        width: calcScaledSize(direction, background.width()),
-        height: calcScaledSize(direction, background.height()),
-    });
-}
+stage.on('mousemove touchmove', (e) => {
+    if (!selection.visible()) return;
+    e.evt.preventDefault();
 
-function calcScaledSize(direction, axis) {
-    return direction > 0 ? axis * scale.step : axis / scale.step
-}
+    x2 = stage.getPointerPosition().x;
+    y2 = stage.getPointerPosition().y;
+
+    selection.setAttrs({
+        x: Math.min(x1, x2),
+        y: Math.min(y1, y2),
+        width: Math.abs(x2 - x1),
+        height: Math.abs(y2 - y1),
+    });
+});
+
+stage.on('mouseup touchend', (e) => {
+    if (!selection.visible()) return;
+
+    e.evt.preventDefault();
+    setTimeout(() => { selection.visible(false); });
+
+    var shapes = stage.find('.element');
+    var box = selection.getClientRect();
+    var selected = shapes.filter((shape) => Konva.Util.haveIntersection(box, shape.getClientRect()));
+    tr.nodes(selected);
+});
+
+stage.on('click tap', function (e) {
+    if (selection.visible()) return;
+
+    if (e.target === stage) {
+        tr.nodes([]);
+        return;
+    }
+
+    if (!e.target.hasName('element')) return;
+
+    const metaPressed = e.evt.shiftKey || e.evt.ctrlKey || e.evt.metaKey;
+    const isSelected = tr.nodes().indexOf(e.target) >= 0;
+
+    if (!metaPressed && !isSelected) tr.nodes([e.target]);
+
+    else if (metaPressed && isSelected) {
+        const nodes = tr.nodes().slice();
+        nodes.splice(nodes.indexOf(e.target), 1);
+        tr.nodes(nodes);
+    }
+    else if (metaPressed && !isSelected) tr.nodes(tr.nodes().concat([e.target]));
+});
+
+
+
+text.on('dragstart', function () {
+    this.moveUp();
+});
 
 inputImage.onchange = function() {
     addFiles(this.files);
@@ -157,20 +206,19 @@ function addImage(file) {
     imageObj.onload = function () {
         const image = new Konva.Image({
             image: imageObj,
-            draggable: true
+            draggable: true,
+            name: 'element'
         });
 
-        image.on('dragstart dragend', e => {
-            image.moveTo((e.type === 'dragstart') ? activeLayer : staticLayer);
-            image.moveToTop();
-            text.moveToTop();
+        image.on('dragstart', function () {
+            this.moveUp();
         });
 
         image.on('dragmove', function(e) {
             if (e.evt.shiftKey) tryAnchor(this);
         });
 
-        staticLayer.add(image);
+        layer.add(image);
     };
     imageObj.src = URL.createObjectURL(file);
 }
