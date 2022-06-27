@@ -324,7 +324,7 @@ function drawLines(lines) {
         const line = new Konva.Line({
             stroke: 'rgb(0, 161, 255)',
             strokeWidth: 1,
-            name: 'guid-line',
+            name: 'guideline',
             dash: [4, 6]
         });
         const orientation = guideline.orientation === 'H';
@@ -338,7 +338,7 @@ function drawLines(lines) {
 }
 
 function removeLines() {
-    layer.find('.guid-line').forEach((l) => l.destroy());
+    layer.find('.guideline').forEach((l) => l.destroy());
 }
 
 function addToNodes(element) {
