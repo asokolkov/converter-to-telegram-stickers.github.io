@@ -35,7 +35,7 @@ const background = new Konva.Rect({
 });
 layer.add(background);
 
-var tr = new Konva.Transformer({
+const tr = new Konva.Transformer({
     anchorStroke: 'red',
     anchorFill: 'yellow',
     anchorSize: 20,
@@ -47,11 +47,12 @@ layer.add(tr);
 const text = new Konva.Text({
     draggable: true,
     fontSize: 65,
-    width: 450,
     fill: 'white',
     stroke: 'black',
     strokeWidth: 5,
-    name: 'element'
+    name: 'element',
+    align: 'center',
+    verticalAlign: 'middle'
 });
 
 const originalFillStroke = Konva.Context.prototype.fillStrokeShape;
@@ -133,23 +134,21 @@ stage.on('mouseleave mouseup touchend', e => {
 stage.on('click tap', e => {
     if (selection.element.visible()) return;
 
-    if (e.target === stage) {
+    const element = e.target;
+
+    if (element === stage) {
         tr.nodes([]);
         return;
     }
 
-    if (!e.target.hasName('element')) return;
+    if (!element.hasName('element')) return;
 
     const ctrlPressed = e.evt.ctrlKey;
-    const isSelected = tr.nodes().includes(e.target);
+    const isSelected = tr.nodes().includes(element);
 
-    if (!ctrlPressed && !isSelected) tr.nodes([e.target]);
-    if (ctrlPressed && !isSelected) tr.nodes(tr.nodes().concat([e.target]));
-    if ((!ctrlPressed && isSelected) || (ctrlPressed && isSelected)) {
-        const nodes = tr.nodes().slice();
-        nodes.splice(nodes.indexOf(e.target), 1);
-        tr.nodes(nodes);
-    }
+    if (!ctrlPressed && !isSelected) tr.nodes([element]);
+    if (ctrlPressed && !isSelected) addToNodes(element);
+    if ((!ctrlPressed && isSelected) || (ctrlPressed && isSelected)) removeFromNodes(element);
 });
 
 text.on('dragstart', function () {
@@ -185,12 +184,25 @@ inputLabel.ondragleave = function(e) {
 
 inputText.oninput = function (e) {
     text.setText(e.target.value);
+    const textSymbols = text.getAttr('text');
+    if (textSymbols) layer.add(text);
+    else text.remove();
 }
 
 inputColor.oninput = function (e) {
     background.fill(e.target.value);
 }
 
+
+function addToNodes(element) {
+    tr.nodes(tr.nodes().concat([element]));
+}
+
+function removeFromNodes(element) {
+    const nodes = tr.nodes().slice();
+    nodes.splice(nodes.indexOf(element), 1);
+    tr.nodes(nodes);
+}
 
 function addFiles(files) {
     if (!Array.isArray(files)) files = Object.values(files);
