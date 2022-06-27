@@ -5,6 +5,7 @@ const inputText = document.getElementById('input-text');
 const buttons = document.getElementById('buttons');
 const galleryWindow = document.getElementById('galleryWindow');
 
+
 const stageWidth = 512;
 const stageHeight = 512;
 let shiftPressed = false;
@@ -14,6 +15,7 @@ anchorAxes.add({axis: 'x', position: 0});
 anchorAxes.add({axis: 'y', position: 0});
 anchorAxes.add({axis: 'x', position: stageWidth});
 anchorAxes.add({axis: 'x', position: stageHeight});
+
 
 const stage = new Konva.Stage({
     container: 'canvas',
@@ -51,7 +53,6 @@ const text = new Konva.Text({
     strokeWidth: 5,
     name: 'element'
 });
-layer.add(text);
 
 const originalFillStroke = Konva.Context.prototype.fillStrokeShape;
 Konva.Context.prototype.fillStrokeShape = function(shape) {
@@ -74,61 +75,63 @@ const verticalLine = new Konva.Line({
     strokeWidth: 5
 });
 
-const selection = new Konva.Rect({
-    fill: 'rgba(0, 0, 255, 0.5)',
-    visible: false,
-});
-layer.add(selection);
+const selection = {
+    element: new Konva.Rect({
+        fill: 'rgba(0, 0, 255, 0.5)',
+        visible: false,
+    }),
+    x1: null,
+    y1: null,
+    x2: null,
+    y2: null
+};
+layer.add(selection.element);
 
 
-
-
-
-let x1, y1, x2, y2;
-stage.on('mousedown touchstart', (e) => {
+stage.on('mousedown touchstart', e => {
     if (e.target !== stage) return;
     e.evt.preventDefault();
 
     const position = stage.getPointerPosition();
-    x1 = position.x;
-    y1 = position.y;
-    x2 = position.x;
-    y2 = position.y;
+    selection.x1 = position.x;
+    selection.y1 = position.y;
+    selection.x2 = position.x;
+    selection.y2 = position.y;
 
-    selection.visible(true);
-    selection.width(0);
-    selection.height(0);
+    selection.element.visible(true);
+    selection.element.width(0);
+    selection.element.height(0);
 });
 
-stage.on('mousemove touchmove', (e) => {
-    if (!selection.visible()) return;
+stage.on('mousemove touchmove', e => {
+    if (!selection.element.visible()) return;
     e.evt.preventDefault();
 
-    x2 = stage.getPointerPosition().x;
-    y2 = stage.getPointerPosition().y;
+    const position = stage.getPointerPosition();
+    selection.x2 = position.x;
+    selection.y2 = position.y;
 
-    selection.setAttrs({
-        x: Math.min(x1, x2),
-        y: Math.min(y1, y2),
-        width: Math.abs(x2 - x1),
-        height: Math.abs(y2 - y1),
+    selection.element.setAttrs({
+        x: Math.min(selection.x1, selection.x2),
+        y: Math.min(selection.y1, selection.y2),
+        width: Math.abs(selection.x2 - selection.x1),
+        height: Math.abs(selection.y2 - selection.y1),
     });
 });
 
-stage.on('mouseup touchend', (e) => {
-    if (!selection.visible()) return;
-
+stage.on('mouseleave mouseup touchend', e => {
+    if (!selection.element.visible()) return;
     e.evt.preventDefault();
-    setTimeout(() => { selection.visible(false); });
 
-    var shapes = stage.find('.element');
-    var box = selection.getClientRect();
-    var selected = shapes.filter((shape) => Konva.Util.haveIntersection(box, shape.getClientRect()));
-    tr.nodes(selected);
+    setTimeout(() => { selection.element.visible(false); });
+
+    tr.nodes(stage.find('.element').filter(shape =>
+        Konva.Util.haveIntersection(selection.element.getClientRect(),
+            shape.getClientRect())));
 });
 
-stage.on('click tap', function (e) {
-    if (selection.visible()) return;
+stage.on('click tap', e => {
+    if (selection.element.visible()) return;
 
     if (e.target === stage) {
         tr.nodes([]);
@@ -137,24 +140,22 @@ stage.on('click tap', function (e) {
 
     if (!e.target.hasName('element')) return;
 
-    const metaPressed = e.evt.shiftKey || e.evt.ctrlKey || e.evt.metaKey;
-    const isSelected = tr.nodes().indexOf(e.target) >= 0;
+    const ctrlPressed = e.evt.ctrlKey;
+    const isSelected = tr.nodes().includes(e.target);
 
-    if (!metaPressed && !isSelected) tr.nodes([e.target]);
-
-    else if (metaPressed && isSelected) {
+    if (!ctrlPressed && !isSelected) tr.nodes([e.target]);
+    if (ctrlPressed && !isSelected) tr.nodes(tr.nodes().concat([e.target]));
+    if ((!ctrlPressed && isSelected) || (ctrlPressed && isSelected)) {
         const nodes = tr.nodes().slice();
         nodes.splice(nodes.indexOf(e.target), 1);
         tr.nodes(nodes);
     }
-    else if (metaPressed && !isSelected) tr.nodes(tr.nodes().concat([e.target]));
 });
-
-
 
 text.on('dragstart', function () {
     this.moveUp();
 });
+
 
 inputImage.onchange = function() {
     addFiles(this.files);
@@ -189,6 +190,7 @@ inputText.oninput = function (e) {
 inputColor.oninput = function (e) {
     background.fill(e.target.value);
 }
+
 
 function addFiles(files) {
     if (!Array.isArray(files)) files = Object.values(files);
