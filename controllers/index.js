@@ -64,18 +64,6 @@ Konva.Context.prototype.fillStrokeShape = function(shape) {
     else originalFillStroke.call(this, shape);
 };
 
-const horizontalLine = new Konva.Line({
-    points: [-1, 0, 1, 0],
-    stroke: 'red',
-    strokeWidth: 5
-});
-
-const verticalLine = new Konva.Line({
-    points: [0, -1, 0, 1],
-    stroke: 'red',
-    strokeWidth: 5
-});
-
 const selection = {
     element: new Konva.Rect({
         fill: 'rgba(0, 0, 255, 0.5)',
@@ -155,6 +143,38 @@ text.on('dragstart', function () {
     this.moveUp();
 });
 
+layer.on('dragmove', e => {
+    removeLines();
+
+    const linesPositions = getLinesPositions(e.target);
+    const elementBounds = getElementSnappingEdges(e.target);
+    const lines = getPossibleLines(linesPositions, elementBounds);
+
+    if (!lines.length) return;
+
+    drawLines(lines);
+
+    const position = e.target.absolutePosition();
+    lines.forEach(guideline => {
+        if (guideline.snap === 'start') {
+            if (guideline.orientation === 'V') position.x = guideline.lineGuide + guideline.offset;
+            else if (guideline.orientation === 'H') position.y = guideline.lineGuide + guideline.offset;
+        }
+        else if (guideline.snap === 'center') {
+            if (guideline.orientation === 'V') position.x = guideline.lineGuide + guideline.offset;
+            else if (guideline.orientation === 'H') position.y = guideline.lineGuide + guideline.offset;
+        }
+        else if (guideline.snap === 'end') {
+            if (guideline.orientation === 'V') position.x = guideline.lineGuide + guideline.offset;
+            else if (guideline.orientation === 'H') position.y = guideline.lineGuide + guideline.offset;
+        }
+    });
+
+    e.target.absolutePosition(position);
+});
+
+layer.on('dragend', () => removeLines());
+
 
 inputImage.onchange = function() {
     addFiles(this.files);
@@ -194,239 +214,132 @@ inputColor.oninput = function (e) {
 };
 
 
+function getLinesPositions(skippableElement) {
+    const verticalPositions = [0, stageWidth / 2, stageWidth];
+    const horizontalPositions = [0, stageHeight / 2, stageHeight];
 
-
-
-function getLineGuideStops(skipShape) {
-    // we can snap to stage borders and the center of the stage
-    var vertical = [0, stage.width() / 2, stage.width()];
-    var horizontal = [0, stage.height() / 2, stage.height()];
-
-    // and we snap over edges and center of each object on the canvas
-    stage.find('.element').forEach((guideItem) => {
-        if (guideItem === skipShape) {
-            return;
-        }
-        var box = guideItem.getClientRect();
-        // and we can snap to all edges of shapes
-        vertical.push([box.x, box.x + box.width, box.x + box.width / 2]);
-        horizontal.push([box.y, box.y + box.height, box.y + box.height / 2]);
+    stage.find('.element').forEach(element => {
+        if (element === skippableElement) return;
+        const box = element.getClientRect();
+        verticalPositions.push(box.x, box.x + box.width, box.x + box.width / 2);
+        horizontalPositions.push(box.y, box.y + box.height, box.y + box.height / 2);
     });
+
     return {
-        vertical: vertical.flat(),
-        horizontal: horizontal.flat(),
+        vertical: [...new Set(verticalPositions)],
+        horizontal: [...new Set(horizontalPositions)]
     };
 }
 
-// what points of the object will trigger to snapping?
-// it can be just center of the object
-// but we will enable all edges and center
-function getObjectSnappingEdges(node) {
-    var box = node.getClientRect();
-    var absPos = node.absolutePosition();
+function getElementSnappingEdges(element) {
+    const box = element.getClientRect();
+    const position = element.absolutePosition();
 
     return {
         vertical: [
             {
                 guide: Math.round(box.x),
-                offset: Math.round(absPos.x - box.x),
+                offset: Math.round(position.x - box.x),
                 snap: 'start',
             },
             {
                 guide: Math.round(box.x + box.width / 2),
-                offset: Math.round(absPos.x - box.x - box.width / 2),
+                offset: Math.round(position.x - box.x - box.width / 2),
                 snap: 'center',
             },
             {
                 guide: Math.round(box.x + box.width),
-                offset: Math.round(absPos.x - box.x - box.width),
+                offset: Math.round(position.x - box.x - box.width),
                 snap: 'end',
             },
         ],
         horizontal: [
             {
                 guide: Math.round(box.y),
-                offset: Math.round(absPos.y - box.y),
+                offset: Math.round(position.y - box.y),
                 snap: 'start',
             },
             {
                 guide: Math.round(box.y + box.height / 2),
-                offset: Math.round(absPos.y - box.y - box.height / 2),
+                offset: Math.round(position.y - box.y - box.height / 2),
                 snap: 'center',
             },
             {
                 guide: Math.round(box.y + box.height),
-                offset: Math.round(absPos.y - box.y - box.height),
+                offset: Math.round(position.y - box.y - box.height),
                 snap: 'end',
-            },
-        ],
+            }
+        ]
     };
 }
 
-// find all snapping possibilities
-function getGuides(lineGuideStops, itemBounds) {
-    var resultV = [];
-    var resultH = [];
-
-    lineGuideStops.vertical.forEach((lineGuide) => {
-        itemBounds.vertical.forEach((itemBound) => {
-            var diff = Math.abs(lineGuide - itemBound.guide);
-            // if the distance between guild line and object snap point is close we can consider this for snapping
-            if (diff < 5) {
-                resultV.push({
-                    lineGuide: lineGuide,
-                    diff: diff,
-                    snap: itemBound.snap,
-                    offset: itemBound.offset,
-                });
-            }
+function getLinesWithDifference(linesPositions, elementBounds) {
+    const result = []
+    const range = 5;
+    linesPositions.forEach(position => {
+        elementBounds.forEach(element => {
+            const difference = Math.abs(position - element.guide);
+            if (difference >= range) return;
+            result.push({
+                lineGuide: position,
+                diff: difference,
+                snap: element.snap,
+                offset: element.offset,
+            });
         });
     });
+    return result;
+}
 
-    lineGuideStops.horizontal.forEach((lineGuide) => {
-        itemBounds.horizontal.forEach((itemBound) => {
-            var diff = Math.abs(lineGuide - itemBound.guide);
-            if (diff < 5) {
-                resultH.push({
-                    lineGuide: lineGuide,
-                    diff: diff,
-                    snap: itemBound.snap,
-                    offset: itemBound.offset,
-                });
-            }
-        });
-    });
+function getPossibleLines(linesPositions, elementBounds) {
+    const vertical = getLinesWithDifference(linesPositions.vertical, elementBounds.vertical);
+    const horizontal = getLinesWithDifference(linesPositions.horizontal, elementBounds.horizontal);
+    const result = [];
 
-    var guides = [];
-
-    // find closest snap
-    var minV = resultV.sort((a, b) => a.diff - b.diff)[0];
-    var minH = resultH.sort((a, b) => a.diff - b.diff)[0];
+    const minV = vertical.sort((a, b) => a.diff - b.diff)[0];
     if (minV) {
-        guides.push({
+        result.push({
             lineGuide: minV.lineGuide,
             offset: minV.offset,
             orientation: 'V',
-            snap: minV.snap,
+            snap: minV.snap
         });
     }
+
+    const minH = horizontal.sort((a, b) => a.diff - b.diff)[0];
     if (minH) {
-        guides.push({
+        result.push({
             lineGuide: minH.lineGuide,
             offset: minH.offset,
             orientation: 'H',
-            snap: minH.snap,
+            snap: minH.snap
         });
     }
-    return guides;
+
+    return result;
 }
 
-function drawGuides(guides) {
-    guides.forEach((lg) => {
-        if (lg.orientation === 'H') {
-            var line = new Konva.Line({
-                points: [-6000, 0, 6000, 0],
-                stroke: 'rgb(0, 161, 255)',
-                strokeWidth: 1,
-                name: 'guid-line',
-                dash: [4, 6],
-            });
-            layer.add(line);
-            line.absolutePosition({
-                x: 0,
-                y: lg.lineGuide,
-            });
-        } else if (lg.orientation === 'V') {
-            var line = new Konva.Line({
-                points: [0, -6000, 0, 6000],
-                stroke: 'rgb(0, 161, 255)',
-                strokeWidth: 1,
-                name: 'guid-line',
-                dash: [4, 6],
-            });
-            layer.add(line);
-            line.absolutePosition({
-                x: lg.lineGuide,
-                y: 0,
-            });
-        }
+function drawLines(lines) {
+    lines.forEach(guideline => {
+        const line = new Konva.Line({
+            stroke: 'rgb(0, 161, 255)',
+            strokeWidth: 1,
+            name: 'guid-line',
+            dash: [4, 6]
+        });
+        const orientation = guideline.orientation === 'H';
+        line.setAttr('points', orientation ? [-6000, 0, 6000, 0] : [0, -6000, 0, 6000]);
+        layer.add(line);
+        line.absolutePosition(orientation
+            ? { x: 0, y: guideline.lineGuide }
+            : { x: guideline.lineGuide, y: 0 }
+        );
     });
 }
 
-layer.on('dragmove', function (e) {
-    // clear all previous lines on the screen
+function removeLines() {
     layer.find('.guid-line').forEach((l) => l.destroy());
-
-    // find possible snapping lines
-    var lineGuideStops = getLineGuideStops(e.target);
-    // find snapping points of current object
-    var itemBounds = getObjectSnappingEdges(e.target);
-
-    // now find where can we snap current object
-    var guides = getGuides(lineGuideStops, itemBounds);
-
-    // do nothing of no snapping
-    if (!guides.length) {
-        return;
-    }
-
-    drawGuides(guides);
-
-    var absPos = e.target.absolutePosition();
-    // now force object position
-    guides.forEach((lg) => {
-        switch (lg.snap) {
-            case 'start': {
-                switch (lg.orientation) {
-                    case 'V': {
-                        absPos.x = lg.lineGuide + lg.offset;
-                        break;
-                    }
-                    case 'H': {
-                        absPos.y = lg.lineGuide + lg.offset;
-                        break;
-                    }
-                }
-                break;
-            }
-            case 'center': {
-                switch (lg.orientation) {
-                    case 'V': {
-                        absPos.x = lg.lineGuide + lg.offset;
-                        break;
-                    }
-                    case 'H': {
-                        absPos.y = lg.lineGuide + lg.offset;
-                        break;
-                    }
-                }
-                break;
-            }
-            case 'end': {
-                switch (lg.orientation) {
-                    case 'V': {
-                        absPos.x = lg.lineGuide + lg.offset;
-                        break;
-                    }
-                    case 'H': {
-                        absPos.y = lg.lineGuide + lg.offset;
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-    });
-    e.target.absolutePosition(absPos);
-});
-
-layer.on('dragend', function (e) {
-    // clear all previous lines on the screen
-    layer.find('.guid-line').forEach((l) => l.destroy());
-});
-
-
-
+}
 
 function addToNodes(element) {
     tr.nodes(tr.nodes().concat([element]));
@@ -462,23 +375,9 @@ function addImage(file) {
             this.moveUp();
         });
 
-        image.on('dragmove', function(e) {
-            if (e.evt.shiftKey) tryAnchor(this);
-        });
-
         layer.add(image);
     };
     imageObj.src = URL.createObjectURL(file);
-}
-
-function tryAnchor(image) {
-    const range = 5;
-    for (const anchor of anchorAxes) {
-        if (anchor.axis === 'x') {
-            const difference1 = image.attrs.x - anchor.position;
-            if (-range < difference1 && difference1 < range) image.attrs.x = anchor.position;
-        }
-    }
 }
 
 function isValidFileFormat(file) {
