@@ -2,8 +2,6 @@ const inputImage = document.getElementById('input');
 const inputLabel = document.getElementById('input-label');
 const inputColor = document.getElementById('input-color');
 const inputText = document.getElementById('input-text');
-const buttons = document.getElementById('buttons');
-const galleryWindow = document.getElementById('galleryWindow');
 
 
 const stageWidth = 512;
@@ -202,16 +200,16 @@ inputLabel.ondragleave = function(e) {
     this.classList.remove('dragover');
 };
 
-inputText.oninput = function (e) {
-    text.setText(e.target.value);
-    const textSymbols = text.getAttr('text');
-    if (textSymbols) layer.add(text);
-    else text.remove();
-};
-
-inputColor.oninput = function (e) {
-    background.fill(e.target.value);
-};
+// inputText.oninput = function (e) {
+//     text.setText(e.target.value);
+//     const textSymbols = text.getAttr('text');
+//     if (textSymbols) layer.add(text);
+//     else text.remove();
+// };
+//
+// inputColor.oninput = function (e) {
+//     background.fill(e.target.value);
+// };
 
 
 function getLinesPositions(skippableElement) {
@@ -359,7 +357,10 @@ function addFiles(files) {
 
     inputLabel.style.display = 'none';
     document.getElementById('canvas').style.display = 'flex';
-    buttons.style.display = 'flex';
+    for (const element of [...document.getElementsByClassName('disabled')]) {
+        element.classList.remove('disabled');
+        element.disabled = false;
+    }
 }
 
 function addImage(file) {
@@ -395,28 +396,4 @@ function download(fileName) {
 function onSubmitClick() {
     imageData = stage.toDataURL({pixelRatio: 1});
     download('image512x512.png');
-    showGalleryWindow();
-}
-
-function showGalleryWindow() {
-    const gwImage = document.getElementById('gw-img');
-    gwImage.src = imageData;
-    galleryWindow.style.display = 'flex';
-}
-
-function closeWindow() {
-    galleryWindow.style.display = 'none';
-}
-
-async function addToGallery() {
-    closeWindow();
-    const sticker = {
-        id: Date.now(),
-        data: imageData
-    };
-    await fetch('/api/stickers', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(sticker)
-    });
 }

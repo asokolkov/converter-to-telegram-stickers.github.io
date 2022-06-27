@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Shitlord's IE</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<section>
+    <div class="editing-block">
+        <label id="input-label">
+            <input id="input" type="file" multiple="multiple">
+            <span class="text-medium">Click to choose images,<br>drag or paste them here</span>
+        </label>
+        <div id="canvas"></div>
+    </div>
+
+    <div class="control-block">
+        <h1>Shitlord's Image Editor</h1>
+
+        <button id="add-text" class="disabled" disabled>
+            <span class="text-medium">Add text</span>
+        </button>
+
+        <button id="change-bg" class="disabled" disabled>
+            <span class="text-medium">Change background</span>
+        </button>
+
+        <button id="submit" class="disabled" onclick="onSubmitClick()" disabled>
+            <span class="text-medium">Submit</span>
+        </button>
+
+        <button id="reload" class="disabled" onclick="document.location.reload();" disabled></button>
+    </div>
+
+</section>
+
+<script src="https://unpkg.com/konva@8/konva.min.js"></script>
+<script src="main.js"></script>
+
+</body>
+</html>

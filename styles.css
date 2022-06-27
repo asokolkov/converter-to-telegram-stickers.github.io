@@ -1,0 +1,129 @@
+:root {
+    --button-color: #EF476F;
+    --selection-color: #FFD166;
+    --text-color: #111;
+    --bg-color: #F5F5F5;
+    --editing-block-color: #FFF;
+    --submit-color: #06D6A0;
+    --didabled-color: #9a9a9a;
+}
+
+body {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    background-color: var(--bg-color);
+}
+
+section {
+    display: flex;
+    margin: auto;
+}
+
+.editing-block {
+    display: flex;
+    width: 512px;
+    height: 512px;
+    margin-right: 100px;
+    background-color: var(--editing-block-color);
+}
+
+.editing-block:active {
+    cursor: all-scroll;
+}
+
+.control-block {
+    display: flex;
+    flex-flow: column;
+    height: 512px;
+    position: relative;
+}
+
+#input-label {
+    display: flex;
+    margin: auto;
+    width: 100%;
+    height: 100%;
+    transition: .3s;
+}
+
+#input-label.dragover {
+    background-color: var(--selection-color);
+}
+
+#input-label:hover {
+    cursor: pointer;
+    background-color: var(--selection-color);
+    transition: .3s;
+}
+
+#input-label > #input {
+    display: none;
+}
+
+#canvas {
+    display: none;
+    width: 100%;
+    height: 100%;
+}
+
+button {
+    margin: 15px 0 0 0;
+    width: fit-content;
+    height: 50px;
+    padding: 0 15px;
+    cursor: pointer;
+    text-decoration: none;
+    border: 0;
+    background-color: var(--button-color);
+    transition: .3s;
+}
+
+button:hover {
+    cursor: pointer;
+    transition: .3s;
+}
+
+#submit {
+    position: absolute;
+    bottom: 0;
+}
+
+#submit:hover {
+    background-color: var(--submit-color);
+}
+
+#reload {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+#add-text:hover, #change-bg:hover, #reload:hover {
+    background-color: var(--selection-color);
+}
+
+.disabled {
+    background-color: var(--didabled-color);
+}
+
+.text-medium {
+    display: flex;
+    margin: auto;
+    font-family: "Montserrat Medium", sans-serif;
+    color: var(--text-color);
+    font-size: 30px;
+    line-height: 40px;
+}
+
+h1 {
+    display: flex;
+    margin: 0 0 20px 0;
+    font-size: 64px;
+    line-height: 40px;
+    font-family: "Montserrat ExtraBold", sans-serif;
+    color: var(--text-color);
+}
