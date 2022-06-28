@@ -2,6 +2,8 @@ const canvas = document.getElementById('canvas');
 const inputImage = document.getElementById('input');
 const inputLabel = document.getElementById('input-label');
 const inputColor = document.getElementById('input-color');
+const inputAddBG = document.getElementById('change-bg-add');
+const inputRemoveBG = document.getElementById('change-bg-remove');
 const inputText = document.getElementById('input-text');
 
 
@@ -224,10 +226,21 @@ canvas.ondrop = function(e) {
 //     else text.remove();
 // };
 
-inputColor.oninput = function (e) {
+inputColor.oninput = function(e) {
     background.fill(e.target.value);
 };
 
+inputColor.onchange = function() {
+    inputAddBG.style.display = 'none';
+    inputRemoveBG.style.display = 'flex';
+};
+
+
+function removeBG() {
+    inputAddBG.style.display = 'flex';
+    inputRemoveBG.style.display = 'none';
+    background.fill(null);
+}
 
 function getLinesPositions(skippableElement) {
     const verticalPositions = [0, stageWidth / 2, stageWidth];

@@ -24,10 +24,14 @@
             <span class="text-medium">Add text</span>
         </button>
 
-        <label class="change-bg text-button" title="Change background color">
+        <label id="change-bg-add" class="change-bg text-button" title="Change background color">
             <span class="text-medium change-bg-text">Change background</span>
             <input id="input-color" type="color">
         </label>
+
+        <button id="change-bg-remove" class="change-bg text-button" title="Remove background color" onclick="removeBG();">
+            <span class="text-medium change-bg-text">Remove background</span>
+        </button>
 
         <button id="submit" class="text-button disabled" title="Submit changes" onclick="onSubmitClick();" disabled>
             <span class="text-medium">Submit</span>
