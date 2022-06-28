@@ -120,7 +120,7 @@ button:hover {
     background-color: var(--disabled-color);
 }
 
-.disabled:hover, #submit.disabled:hover {
+.disabled:hover, #submit.disabled:hover, #change-bg-add.disabled:hover {
     background-color: var(--disabled-selection-color);
 }
 
@@ -128,6 +128,17 @@ button:hover {
     width: 40px;
     height: 40px;
     filter: invert(2%) sepia(11%) saturate(577%) hue-rotate(315deg) brightness(116%) contrast(76%);
+}
+
+.text-icon {
+    display: flex;
+    width: 30px;
+    height: 30px;
+    margin: auto 13px auto 0;
+}
+
+#add-text {
+    display: flex;
 }
 
 .change-bg {

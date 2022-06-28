@@ -435,6 +435,7 @@ function addTextEvent(button) {
     layer.add(text);
     inputText.select();
     inputText.value='';
+    document.body.style.cursor = 'default';
 
     inputText.oninput = e => text.setText(e.target.value);
     setTimeout(() => {
@@ -465,8 +466,6 @@ function deactivateAddingTextCondition(button, text) {
     inputText.oninput = () => false;
 
     stage.off('mouseenter.addingText mouseleave.addingText');
-    document.body.style.cursor = 'default';
-
     stage.off('click tap');
     stage.on('click tap', e => selectElementEvent(e));
 }

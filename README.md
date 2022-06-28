@@ -1,6 +1,6 @@
 # Shitlord's Image Editor
 
-## [Рабочий сайт](https://oi-editor.herokuapp.com/)
+## [Рабочий сайт](https://shitlords-image-editor.vercel.app/)
 
 ## TODO
 1. History
