@@ -6,6 +6,31 @@
 </head>
 <body>
 
+<script>
+    customElements.define("load-file", class extends HTMLElement {
+
+        // declare default connectedCallback as sync so await can be used
+        async connectedCallback(
+            // call connectedCallback with parameter to *replace* SVG (of <load-file> persists)
+            src = this.getAttribute("src"),
+            // attach a shadowRoot if none exists (prevents displaying error when moving Nodes)
+            // declare as parameter to save 4 Bytes: 'let '
+            shadowRoot = this.shadowRoot || this.attachShadow({mode:"open"})
+        ) {
+            // load SVG file from src="" async, parse to text, add to shadowRoot.innerHTML
+            shadowRoot.innerHTML = await (await fetch(src)).text()
+
+            // append optional <tag [shadowRoot]> Elements from inside <load-svg> after parsed <svg>
+            shadowRoot.append(...this.querySelectorAll("[shadowRoot]"))
+
+            // if "replaceWith" attribute
+            // then replace <load-svg> with loaded content <load-svg>
+            // childNodes instead of children to include #textNodes also
+            this.hasAttribute("replaceWith") && this.replaceWith(...shadowRoot.childNodes)
+        }
+    })
+</script>
+
 <section>
     <div class="editing-block">
         <label id="input-label">
@@ -18,19 +43,26 @@
     <div class="control-block">
         <h1>Shitlord's Image Editor</h1>
 
-        <button id="add-text" class="disabled" disabled>
+        <button id="add-text" class="text-button disabled" title="Add text block" disabled>
             <span class="text-medium">Add text</span>
         </button>
 
-        <button id="change-bg" class="disabled" disabled>
+        <button id="change-bg" class="text-button disabled" title="Change background color" disabled>
             <span class="text-medium">Change background</span>
         </button>
 
-        <button id="submit" class="disabled" onclick="onSubmitClick()" disabled>
+        <button id="submit" class="text-button disabled" title="Submit changes" onclick="onSubmitClick();" disabled>
             <span class="text-medium">Submit</span>
         </button>
-
-        <button id="reload" class="disabled" onclick="document.location.reload();" disabled></button>
+        <button id="reload" class="square-button disabled" title="Reload page" onclick="document.location.reload();" disabled>
+            <img class="button-icon" src="images/reload.svg" alt="" draggable="false"/>
+        </button>
+        <button id="help" class="square-button" title="Site info" onclick="onHelpClick();">
+            <img class="button-icon" src="images/help.svg" alt="" draggable="false"/>
+        </button>
+        <button id="night-mode" class="square-button" title="Switch night mode" onclick="onNightModeClick();">
+            <img class="button-icon" src="images/nightMode.svg" alt="" draggable="false"/>
+        </button>
     </div>
 
 </section>

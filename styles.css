@@ -6,6 +6,7 @@
     --editing-block-color: #FFF;
     --submit-color: #06D6A0;
     --didabled-color: #9a9a9a;
+    --didabled-selecction-color: #888;
 }
 
 body {
@@ -70,10 +71,6 @@ section {
 }
 
 button {
-    margin: 15px 0 0 0;
-    width: fit-content;
-    height: 50px;
-    padding: 0 15px;
     cursor: pointer;
     text-decoration: none;
     border: 0;
@@ -81,8 +78,16 @@ button {
     transition: .3s;
 }
 
+.text-button {
+    width: fit-content;
+    padding: 0 15px;
+    margin: 15px 0 0 0;
+    height: 50px;
+}
+
 button:hover {
     cursor: pointer;
+    background-color: var(--selection-color);
     transition: .3s;
 }
 
@@ -95,20 +100,34 @@ button:hover {
     background-color: var(--submit-color);
 }
 
-#reload {
-    width: 50px;
-    height: 50px;
+.square-button {
+    display: flex;
+    padding: 5px;
     position: absolute;
     bottom: 0;
     right: 0;
 }
 
-#add-text:hover, #change-bg:hover, #reload:hover {
-    background-color: var(--selection-color);
+#night-mode {
+    margin-bottom: 65px;
+}
+
+#help {
+    margin-right: 65px;
 }
 
 .disabled {
     background-color: var(--didabled-color);
+}
+
+.disabled:hover, #submit.disabled:hover {
+    background-color: var(--didabled-selecction-color);
+}
+
+.button-icon {
+    width: 40px;
+    height: 40px;
+    filter: invert(0%) sepia(0%) saturate(1198%) hue-rotate(197deg) brightness(101%) contrast(87%);
 }
 
 .text-medium {

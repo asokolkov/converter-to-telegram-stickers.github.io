@@ -397,3 +397,11 @@ function onSubmitClick() {
     imageData = stage.toDataURL({pixelRatio: 1});
     download('image512x512.png');
 }
+
+function onNightModeClick() {
+
+}
+
+function onHelpClick() {
+
+}
