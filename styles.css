@@ -64,6 +64,12 @@ section {
     height: 100%;
 }
 
+#canvas.dragover {
+    cursor: pointer;
+    outline: 10px solid var(--selection-color);
+    transition: .3s;
+}
+
 button {
     cursor: pointer;
     text-decoration: none;

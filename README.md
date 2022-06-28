@@ -9,6 +9,4 @@
 4. Online filing
 5. Infinity text
 6. Element deleting
-7. Element dropping on stage
 8. Element cropping
-9. Dark mode

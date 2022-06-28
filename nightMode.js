@@ -1,4 +1,4 @@
-const nightMode = new darken({
+new darken({
     toggle: '#night-mode',
     variables : {
         '--text-header-color' : ['#222', '#F5F5F5'],

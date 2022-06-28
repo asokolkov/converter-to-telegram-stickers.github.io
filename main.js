@@ -1,3 +1,4 @@
+const canvas = document.getElementById('canvas');
 const inputImage = document.getElementById('input');
 const inputLabel = document.getElementById('input-label');
 const inputColor = document.getElementById('input-color');
@@ -200,6 +201,22 @@ inputLabel.ondragleave = function(e) {
     this.classList.remove('dragover');
 };
 
+canvas.ondragover = function(e) {
+    e.preventDefault();
+    this.classList.add('dragover');
+};
+
+canvas.ondragleave = function(e) {
+    e.preventDefault();
+    this.classList.remove('dragover');
+};
+
+canvas.ondrop = function(e) {
+    e.preventDefault();
+    addFiles(e.dataTransfer.files);
+    this.classList.remove('dragover');
+};
+
 // inputText.oninput = function (e) {
 //     text.setText(e.target.value);
 //     const textSymbols = text.getAttr('text');
@@ -351,12 +368,10 @@ function removeFromNodes(element) {
 
 function addFiles(files) {
     if (!Array.isArray(files)) files = Object.values(files);
-    files.forEach(file => {
-        if (isValidFileFormat(file)) addImage(file);
-    });
+    files.forEach(file => addImage(file));
 
     inputLabel.style.display = 'none';
-    document.getElementById('canvas').style.display = 'flex';
+    canvas.style.display = 'flex';
     for (const element of [...document.getElementsByClassName('disabled')]) {
         element.classList.remove('disabled');
         element.disabled = false;
@@ -364,6 +379,8 @@ function addFiles(files) {
 }
 
 function addImage(file) {
+    if (!isValidFileFormat(file)) return;
+
     const imageObj = new Image();
     imageObj.onload = function () {
         const image = new Konva.Image({
