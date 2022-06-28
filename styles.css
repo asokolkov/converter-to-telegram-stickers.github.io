@@ -1,12 +1,9 @@
 :root {
     --button-color: #EF476F;
     --selection-color: #FFD166;
-    --text-color: #111;
-    --bg-color: #F5F5F5;
-    --editing-block-color: #FFF;
     --submit-color: #06D6A0;
-    --didabled-color: #9a9a9a;
-    --didabled-selecction-color: #888;
+    --text-color: #222;
+    --editing-block-color: #FFF;
 }
 
 body {
@@ -15,6 +12,7 @@ body {
     padding: 0;
     height: 100vh;
     background-color: var(--bg-color);
+    transition: .3s;
 }
 
 section {
@@ -50,13 +48,9 @@ section {
     transition: .3s;
 }
 
-#input-label.dragover {
-    background-color: var(--selection-color);
-}
-
-#input-label:hover {
+#input-label:hover, #input-label.dragover {
     cursor: pointer;
-    background-color: var(--selection-color);
+    box-shadow: inset 0 0 0 10px var(--selection-color);
     transition: .3s;
 }
 
@@ -117,17 +111,17 @@ button:hover {
 }
 
 .disabled {
-    background-color: var(--didabled-color);
+    background-color: var(--disabled-color);
 }
 
 .disabled:hover, #submit.disabled:hover {
-    background-color: var(--didabled-selecction-color);
+    background-color: var(--disabled-selection-color);
 }
 
 .button-icon {
     width: 40px;
     height: 40px;
-    filter: invert(0%) sepia(0%) saturate(1198%) hue-rotate(197deg) brightness(101%) contrast(87%);
+    filter: invert(2%) sepia(11%) saturate(577%) hue-rotate(315deg) brightness(116%) contrast(76%);
 }
 
 .text-medium {
@@ -145,5 +139,5 @@ h1 {
     font-size: 64px;
     line-height: 40px;
     font-family: "Montserrat ExtraBold", sans-serif;
-    color: var(--text-color);
+    color: var(--text-header-color);
 }

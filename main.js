@@ -398,10 +398,6 @@ function onSubmitClick() {
     download('image512x512.png');
 }
 
-function onNightModeClick() {
-
-}
-
 function onHelpClick() {
 
 }

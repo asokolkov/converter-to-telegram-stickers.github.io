@@ -6,30 +6,7 @@
 </head>
 <body>
 
-<script>
-    customElements.define("load-file", class extends HTMLElement {
-
-        // declare default connectedCallback as sync so await can be used
-        async connectedCallback(
-            // call connectedCallback with parameter to *replace* SVG (of <load-file> persists)
-            src = this.getAttribute("src"),
-            // attach a shadowRoot if none exists (prevents displaying error when moving Nodes)
-            // declare as parameter to save 4 Bytes: 'let '
-            shadowRoot = this.shadowRoot || this.attachShadow({mode:"open"})
-        ) {
-            // load SVG file from src="" async, parse to text, add to shadowRoot.innerHTML
-            shadowRoot.innerHTML = await (await fetch(src)).text()
-
-            // append optional <tag [shadowRoot]> Elements from inside <load-svg> after parsed <svg>
-            shadowRoot.append(...this.querySelectorAll("[shadowRoot]"))
-
-            // if "replaceWith" attribute
-            // then replace <load-svg> with loaded content <load-svg>
-            // childNodes instead of children to include #textNodes also
-            this.hasAttribute("replaceWith") && this.replaceWith(...shadowRoot.childNodes)
-        }
-    })
-</script>
+<script src="//unpkg.com/darken"></script>
 
 <section>
     <div class="editing-block">
@@ -60,7 +37,7 @@
         <button id="help" class="square-button" title="Site info" onclick="onHelpClick();">
             <img class="button-icon" src="images/help.svg" alt="" draggable="false"/>
         </button>
-        <button id="night-mode" class="square-button" title="Switch night mode" onclick="onNightModeClick();">
+        <button id="night-mode" class="square-button" title="Switch night mode">
             <img class="button-icon" src="images/nightMode.svg" alt="" draggable="false"/>
         </button>
     </div>
@@ -68,6 +45,7 @@
 </section>
 
 <script src="https://unpkg.com/konva@8/konva.min.js"></script>
+<script src="nightMode.js"></script>
 <script src="main.js"></script>
 
 </body>
