@@ -9,4 +9,5 @@
 4. Online filing
 5. Infinity text
 6. Element deleting
+7. Help button (react required)
 8. Element cropping

@@ -15,19 +15,22 @@
             <span class="text-medium">Click to choose images,<br>drag or paste them here</span>
         </label>
         <div id="canvas"></div>
+        <label for="text-input">
+            <input id="text-input" type="text">
+        </label>
     </div>
 
     <div class="control-block">
         <h1>Shitlord's Image Editor</h1>
 
-        <button id="add-text" class="text-button disabled" title="Add text block" disabled>
+        <button id="add-text" class="text-button disabled" title="Add text block" onclick="toggleAddingText(this);" disabled>
             <span class="text-medium">Add text</span>
         </button>
 
-        <label id="change-bg-add" class="change-bg text-button" title="Change background color">
+        <button id="change-bg-add" class="change-bg text-button disabled" title="Change background color">
             <span class="text-medium change-bg-text">Change background</span>
-            <input id="input-color" type="color">
-        </label>
+            <input id="input-color" type="color" disabled>
+        </button>
 
         <button id="change-bg-remove" class="change-bg text-button" title="Remove background color" onclick="removeBG();">
             <span class="text-medium change-bg-text">Remove background</span>

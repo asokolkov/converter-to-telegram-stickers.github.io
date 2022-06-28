@@ -133,8 +133,13 @@ button:hover {
 .change-bg {
     display: flex;
     position: relative;
-    background-color: var(--button-color);
     transition: .3s;
+}
+
+#text-input {
+    position: fixed;
+    left: -10000px;
+    opacity: 1;
 }
 
 .change-bg:hover {

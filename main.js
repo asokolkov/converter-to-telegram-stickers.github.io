@@ -4,7 +4,7 @@ const inputLabel = document.getElementById('input-label');
 const inputColor = document.getElementById('input-color');
 const inputAddBG = document.getElementById('change-bg-add');
 const inputRemoveBG = document.getElementById('change-bg-remove');
-const inputText = document.getElementById('input-text');
+const inputText = document.getElementById('text-input');
 
 
 const stageWidth = 512;
@@ -44,17 +44,6 @@ const tr = new Konva.Transformer({
     rotationSnaps: [0, 45, 90, 135, 180, 225, 270, 315]
 });
 layer.add(tr);
-
-const text = new Konva.Text({
-    draggable: true,
-    fontSize: 65,
-    fill: 'white',
-    stroke: 'black',
-    strokeWidth: 5,
-    name: 'element',
-    align: 'center',
-    verticalAlign: 'middle'
-});
 
 const originalFillStroke = Konva.Context.prototype.fillStrokeShape;
 Konva.Context.prototype.fillStrokeShape = function(shape) {
@@ -114,13 +103,15 @@ stage.on('mouseleave mouseup touchend', e => {
     e.evt.preventDefault();
 
     setTimeout(() => { selection.element.visible(false); });
-
-    tr.nodes(stage.find('.element').filter(shape =>
+    const elements = stage.find('.element').concat(stage.find('.text'))
+    tr.nodes(elements.filter(shape =>
         Konva.Util.haveIntersection(selection.element.getClientRect(),
             shape.getClientRect())));
 });
 
-stage.on('click tap', e => {
+stage.on('click tap', e => selectElementEvent(e));
+
+function selectElementEvent(e) {
     if (selection.element.visible()) return;
 
     const element = e.target;
@@ -130,7 +121,7 @@ stage.on('click tap', e => {
         return;
     }
 
-    if (!element.hasName('element')) return;
+    if (!element.hasName('element') && !element.hasName('text')) return;
 
     const ctrlPressed = e.evt.ctrlKey;
     const isSelected = tr.nodes().includes(element);
@@ -138,10 +129,10 @@ stage.on('click tap', e => {
     if (!ctrlPressed && !isSelected) tr.nodes([element]);
     if (ctrlPressed && !isSelected) addToNodes(element);
     if ((!ctrlPressed && isSelected) || (ctrlPressed && isSelected)) removeFromNodes(element);
-});
+}
 
-text.on('dragstart', function () {
-    this.moveUp();
+layer.on('dragstart', function () {
+    stage.find('.text').forEach(text => text.moveToTop());
 });
 
 layer.on('dragmove', e => {
@@ -218,13 +209,6 @@ canvas.ondrop = function(e) {
     addFiles(e.dataTransfer.files);
     this.classList.remove('dragover');
 };
-
-// inputText.oninput = function (e) {
-//     text.setText(e.target.value);
-//     const textSymbols = text.getAttr('text');
-//     if (textSymbols) layer.add(text);
-//     else text.remove();
-// };
 
 inputColor.oninput = function(e) {
     background.fill(e.target.value);
@@ -387,6 +371,8 @@ function addFiles(files) {
     canvas.style.display = 'flex';
     for (const element of [...document.getElementsByClassName('disabled')]) {
         element.classList.remove('disabled');
+        for (let i = 0; i < element.children.length; i++)
+            if (element.children[i].disabled) element.children[i].disabled = false;
         element.disabled = false;
     }
 }
@@ -430,4 +416,65 @@ function onSubmitClick() {
 
 function onHelpClick() {
 
+}
+
+function addTextEvent(button) {
+    const position = stage.getRelativePointerPosition();
+    const text = new Konva.Text({
+        x: position.x,
+        y: position.y,
+        draggable: true,
+        fontSize: 65,
+        fill: 'white',
+        stroke: 'black',
+        strokeWidth: 5,
+        name: 'text',
+        align: 'center',
+        verticalAlign: 'middle'
+    });
+    layer.add(text);
+    inputText.select();
+    inputText.value='';
+
+    inputText.oninput = e => text.setText(e.target.value);
+    setTimeout(() => {
+        document.onclick = () => deactivateAddingTextCondition(button, text);
+    }, 10);
+}
+
+function activateAddingTextCondition(button) {
+    button.style.backgroundColor = '#FFD166';
+    stage.on('mouseenter.addingText', () => {
+        document.body.style.cursor = 'text';
+    });
+    stage.on('mouseleave.addingText', () => {
+        document.body.style.cursor = 'default';
+    });
+    stage.off('click tap');
+    stage.on('click tap', () => addTextEvent(button));
+}
+
+function deactivateAddingTextCondition(button, text) {
+    if (text && !text.getAttr('text')) text.remove();
+
+    addingTextCondition = false;
+
+    button.style.backgroundColor = '#EF476F';
+
+    document.onclick = () => false;
+    inputText.oninput = () => false;
+
+    stage.off('mouseenter.addingText mouseleave.addingText');
+    document.body.style.cursor = 'default';
+
+    stage.off('click tap');
+    stage.on('click tap', e => selectElementEvent(e));
+}
+
+let addingTextCondition = false;
+
+function toggleAddingText(button) {
+    addingTextCondition = !addingTextCondition;
+    if (addingTextCondition) activateAddingTextCondition(button);
+    else deactivateAddingTextCondition(button, null);
 }
