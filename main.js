@@ -435,16 +435,13 @@ function addTextEvent(button) {
     layer.add(text);
     inputText.select();
     inputText.value='';
-    document.body.style.cursor = 'default';
 
     inputText.oninput = e => text.setText(e.target.value);
-    setTimeout(() => {
-        document.onclick = () => deactivateAddingTextCondition(button, text);
-    }, 10);
+    document.onclick = () => deactivateAddingTextCondition(button, text);
 }
 
 function activateAddingTextCondition(button) {
-    button.style.backgroundColor = '#FFD166';
+    button.classList.add('active-button');
     stage.on('mouseenter.addingText', () => {
         document.body.style.cursor = 'text';
     });
@@ -455,25 +452,22 @@ function activateAddingTextCondition(button) {
     stage.on('click tap', () => addTextEvent(button));
 }
 
+let freeClicks = 1;
+
 function deactivateAddingTextCondition(button, text) {
+    if (freeClicks-- === 1) return;
     if (text && !text.getAttr('text')) text.remove();
 
-    addingTextCondition = false;
-
-    button.style.backgroundColor = '#EF476F';
+    button.classList.remove('active-button');
 
     document.onclick = () => false;
     inputText.oninput = () => false;
 
     stage.off('mouseenter.addingText mouseleave.addingText');
+    document.body.style.cursor = 'default';
+
     stage.off('click tap');
     stage.on('click tap', e => selectElementEvent(e));
-}
 
-let addingTextCondition = false;
-
-function toggleAddingText(button) {
-    addingTextCondition = !addingTextCondition;
-    if (addingTextCondition) activateAddingTextCondition(button);
-    else deactivateAddingTextCondition(button, null);
+    freeClicks = 1;
 }

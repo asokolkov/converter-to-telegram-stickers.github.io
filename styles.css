@@ -24,12 +24,17 @@ section {
     display: flex;
     width: 512px;
     height: 512px;
-    margin-right: 100px;
+    margin-right: 85px;
     background-color: var(--editing-block-color);
 }
 
 .editing-block:active {
     cursor: all-scroll;
+}
+
+.active-button {
+    background-color: var(--selection-color);
+    transition: .3s;
 }
 
 .control-block {
