@@ -223,10 +223,10 @@ canvas.ondrop = function(e) {
 //     if (textSymbols) layer.add(text);
 //     else text.remove();
 // };
-//
-// inputColor.oninput = function (e) {
-//     background.fill(e.target.value);
-// };
+
+inputColor.oninput = function (e) {
+    background.fill(e.target.value);
+};
 
 
 function getLinesPositions(skippableElement) {

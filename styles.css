@@ -130,6 +130,27 @@ button:hover {
     filter: invert(2%) sepia(11%) saturate(577%) hue-rotate(315deg) brightness(116%) contrast(76%);
 }
 
+.change-bg {
+    display: flex;
+    position: relative;
+    background-color: var(--button-color);
+    transition: .3s;
+}
+
+.change-bg:hover {
+    background-color: var(--selection-color);
+    transition: .3s;
+}
+
+#input-color {
+    left: 0;
+    position: absolute;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+}
+
 .text-medium {
     display: flex;
     margin: auto;

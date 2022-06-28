@@ -24,19 +24,23 @@
             <span class="text-medium">Add text</span>
         </button>
 
-        <button id="change-bg" class="text-button disabled" title="Change background color" disabled>
-            <span class="text-medium">Change background</span>
-        </button>
+        <label class="change-bg text-button" title="Change background color">
+            <span class="text-medium change-bg-text">Change background</span>
+            <input id="input-color" type="color">
+        </label>
 
         <button id="submit" class="text-button disabled" title="Submit changes" onclick="onSubmitClick();" disabled>
             <span class="text-medium">Submit</span>
         </button>
+
         <button id="reload" class="square-button disabled" title="Reload page" onclick="document.location.reload();" disabled>
             <img class="button-icon" src="images/reload.svg" alt="" draggable="false"/>
         </button>
+
         <button id="help" class="square-button" title="Site info" onclick="onHelpClick();">
             <img class="button-icon" src="images/help.svg" alt="" draggable="false"/>
         </button>
+
         <button id="night-mode" class="square-button" title="Switch night mode">
             <img class="button-icon" src="images/nightMode.svg" alt="" draggable="false"/>
         </button>
