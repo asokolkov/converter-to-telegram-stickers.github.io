@@ -455,7 +455,7 @@ function activateAddingTextCondition(button) {
 let freeClicks = 1;
 
 function deactivateAddingTextCondition(button, text) {
-    if (freeClicks-- === 1) return;
+    if (freeClicks--) return;
     if (text && !text.getAttr('text')) text.remove();
 
     button.classList.remove('active-button');
