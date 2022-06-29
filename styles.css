@@ -67,6 +67,10 @@ section {
     display: none;
     width: 100%;
     height: 100%;
+
+    opacity: 1;
+    background: center repeat url("images/crossSpace.svg");
+    background-size: 20%;
 }
 
 #canvas.dragover {
