@@ -1,0 +1,25 @@
+.button {
+    display: flex;
+    text-decoration: none;
+    border: 0;
+    background-color: #EF476F;
+    transition: .3s;
+    margin: auto 0 0 auto;
+    height: 50px;
+    width: 50px;
+    position: absolute;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #FFD166;
+    transition: .3s;
+}
+
+.disabled {
+    background-color: #9a9a9a;
+}
+
+.disabled:hover {
+    background-color: #888;
+}

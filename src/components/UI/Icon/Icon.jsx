@@ -1,12 +1,12 @@
 import React from 'react';
 import classes from './Icon.module.css';
 
-const Icon = ({path}) => {
+const Icon = ({path, margin='auto 10px auto 0'}) => {
     return (
-        <img
+        <img style={{margin: margin}}
             className={classes.icon}
             src={path}
-            alt="Icon"
+            alt=""
             draggable="false"
         />
     );

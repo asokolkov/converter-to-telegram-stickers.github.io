@@ -10,6 +10,7 @@ const EditingBlock = () => {
         setFiles(files.concat(newFiles));
     };
 
+    setInterval(() => console.log(files), 1000)
     return (
         <div id="EditingBlock">
             <FileUploader addFiles={addFiles} files={files} />

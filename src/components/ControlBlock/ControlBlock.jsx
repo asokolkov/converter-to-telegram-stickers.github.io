@@ -1,11 +1,14 @@
 import React from 'react';
 import classes from './ControlBlock.module.css';
-import TextButton from "../UI/TextButton/TextButton";
-import Icon from "../UI/Icon/Icon";
-import ColorInput from "../UI/ColorInput/ColorInput";
+import TextButton from '../UI/TextButton/TextButton';
+import Icon from '../UI/Icon/Icon';
+import IconButton from '../UI/IconButton/IconButton';
 
 import textIcon from '../../images/text.svg';
 import bgIcon from '../../images/bg.svg';
+import helpIcon from '../../images/help.svg';
+import reloadIcon from '../../images/reload.svg';
+import nightIcon from '../../images/nightMode.svg';
 
 const ControlBlock = () => {
     const [data, setData] = React.useState([
@@ -31,6 +34,26 @@ const ControlBlock = () => {
             onClick: null,
         },
     ]);
+    const [iconButtonData, setIconButtonData] = React.useState([
+        {
+            title: 'Reload page',
+            disabled: false,
+            onClick: null,
+            iconPath: reloadIcon
+        },
+        {
+            title: 'Open site guide',
+            disabled: false,
+            onClick: null,
+            iconPath: helpIcon
+        },
+        {
+            title: 'Switch dark mode',
+            disabled: false,
+            onClick: null,
+            iconPath: nightIcon
+        },
+    ]);
 
     return (
         <div className={classes.controlBlock}>
@@ -38,6 +61,9 @@ const ControlBlock = () => {
             <TextButton data={data[0]} />
             <TextButton data={data[1]} />
             <TextButton data={data[2]} />
+            <IconButton data={iconButtonData[0]} shift={{right: 0, bottom: 0}}/>
+            <IconButton data={iconButtonData[1]} shift={{right: 65, bottom: 0}}/>
+            <IconButton data={iconButtonData[2]} shift={{right: 0, bottom: 65}}/>
         </div>
     );
 };

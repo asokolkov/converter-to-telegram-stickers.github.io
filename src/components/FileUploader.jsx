@@ -6,7 +6,18 @@ const FileUploader = ({addFiles, files}) => {
 
     function getValidFiles(files) {
         if (!Array.isArray(files)) files = Object.values(files);
-        return files.filter(file => isValidFileFormat(file));
+        const filteredFiles = files.filter(file => isValidFileFormat(file));
+        return filteredFiles.map(file => fileToBase64(file));
+    }
+
+    function fileToBase64(file) {
+        const reader  = new FileReader();
+        reader.onabort = () => console.log("File reading was aborted");
+        reader.onerror = () => console.log("File reading has failed");
+        reader.onloadend = () => {
+            return addFiles(reader.result);
+        };
+        reader.readAsDataURL(file);
     }
 
     function isValidFileFormat(file) {
@@ -20,7 +31,7 @@ const FileUploader = ({addFiles, files}) => {
                 id="input"
                 type="file"
                 multiple="multiple"
-                onChange={e => addFiles(getValidFiles(e.target.files))}
+                onChange={e => getValidFiles(e.target.files)}
             />
                 <span className="text">
                     Click to choose images,<br/>drag or paste them here
