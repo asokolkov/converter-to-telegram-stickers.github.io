@@ -1,5 +1,5 @@
 import React from 'react';
-import FileUploader from './FileUploader';
+import FileUploader from './FileUploader/FileUploader';
 import KonvaStage from './KonvaStage';
 import '../styles/EditingBlock.css';
 
@@ -10,7 +10,6 @@ const EditingBlock = () => {
         setFiles(files.concat(newFiles));
     };
 
-    setInterval(() => console.log(files), 1000)
     return (
         <div id="EditingBlock">
             <FileUploader addFiles={addFiles} files={files} />
