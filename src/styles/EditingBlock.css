@@ -1,0 +1,8 @@
+#EditingBlock {
+    background-color: #FFF;
+    margin-right: 85px;
+}
+
+#EditingBlock:active {
+    cursor: all-scroll;
+}

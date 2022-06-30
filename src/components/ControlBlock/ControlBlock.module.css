@@ -1,0 +1,14 @@
+.controlBlock {
+    display: flex;
+    flex-flow: column;
+    height: 512px;
+}
+
+.h1 {
+    display: flex;
+    margin: 0 0 30px 0;
+    font-size: 64px;
+    line-height: 40px;
+    font-family: "Montserrat ExtraBold", sans-serif;
+    color: #222;
+}

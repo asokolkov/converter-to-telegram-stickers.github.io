@@ -1,0 +1,16 @@
+body {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    background-color: #efeded;
+    transition: .3s;
+}
+
+#root {
+    margin: auto;
+}
+
+#App {
+    display: flex;
+}

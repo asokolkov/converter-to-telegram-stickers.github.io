@@ -1,0 +1,50 @@
+.button {
+    display: flex;
+    text-decoration: none;
+    border: 0;
+    background-color: #EF476F;
+    transition: .3s;
+    width: fit-content;
+    padding: 0 15px;
+    margin: 15px 0 0 0;
+    height: 50px;
+    position: relative;
+}
+
+.button:hover {
+    background-color: #FFD166;
+    transition: .3s;
+}
+
+.submit {
+    display: flex;
+    text-decoration: none;
+    border: 0;
+    background-color: #EF476F;
+    transition: .3s;
+    width: fit-content;
+    padding: 0 15px;
+    margin: auto auto 0 0;
+    height: 50px;
+}
+
+.submit:hover {
+    background-color: #06D6A0;
+    transition: .3s;
+}
+
+.disabled {
+    background-color: #9a9a9a;
+}
+
+.disabled:hover {
+    background-color: #888;
+}
+
+.text {
+    margin: auto 0;
+    font-family: "Montserrat Medium", sans-serif;
+    color: #222;
+    font-size: 30px;
+    line-height: 40px;
+}
