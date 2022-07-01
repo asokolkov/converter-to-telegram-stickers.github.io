@@ -2,9 +2,9 @@ import React from 'react';
 import classes from './KonvaStage.module.css';
 import {Stage, Layer, Text, Rect, Image} from 'react-konva';
 
-const KonvaStage = ({images}) => {
+const KonvaStage = ({images, stageRef}) => {
     return (
-        <Stage width={512} height={512} className={classes.stage}>
+        <Stage width={512} height={512} className={classes.stage} ref={stageRef}>
             <Layer>
                 {images.map(image => (
                     <Image
@@ -14,7 +14,6 @@ const KonvaStage = ({images}) => {
                         onDragStart={function() {
                             this.moveToTop();
                         }}
-                        id={image}
                     />
                 ))}
             </Layer>

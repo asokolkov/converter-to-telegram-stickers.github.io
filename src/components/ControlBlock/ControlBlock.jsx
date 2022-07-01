@@ -1,16 +1,15 @@
-import React from 'react';
+import React , {useContext} from 'react';
 import classes from './ControlBlock.module.css';
 import TextButton from '../UI/TextButton/TextButton';
 import Icon from '../UI/Icon/Icon';
 import IconButton from '../UI/IconButton/IconButton';
-
 import textIcon from '../../images/text.svg';
 import bgIcon from '../../images/bg.svg';
 import helpIcon from '../../images/help.svg';
 import reloadIcon from '../../images/reload.svg';
 import nightIcon from '../../images/nightMode.svg';
 
-const ControlBlock = () => {
+const ControlBlock = ({stageRef}) => {
     const [data] = React.useState([
         {
             text: 'Add Text',
@@ -31,7 +30,7 @@ const ControlBlock = () => {
             text: 'Submit',
             title: 'Save image',
             disabled: false,
-            onClick: null,
+            onClick: downloadStage,
         },
     ]);
     const [iconButtonData] = React.useState([
@@ -54,6 +53,15 @@ const ControlBlock = () => {
             iconPath: nightIcon
         },
     ]);
+
+    function downloadStage() {
+        const link = document.createElement('a');
+        link.download = 'image500x500.png';
+        link.href = stageRef.current.toDataURL();
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 
     return (
         <div className={classes.controlBlock}>
