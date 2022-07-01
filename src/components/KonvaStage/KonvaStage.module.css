@@ -1,0 +1,5 @@
+.stage {
+    opacity: 1;
+    background: center repeat url("../../images/crossSpace.svg");
+    background-size: 20%;
+}

@@ -11,7 +11,7 @@ import reloadIcon from '../../images/reload.svg';
 import nightIcon from '../../images/nightMode.svg';
 
 const ControlBlock = () => {
-    const [data, setData] = React.useState([
+    const [data] = React.useState([
         {
             text: 'Add Text',
             title: 'Click on canvas to add text',
@@ -34,7 +34,7 @@ const ControlBlock = () => {
             onClick: null,
         },
     ]);
-    const [iconButtonData, setIconButtonData] = React.useState([
+    const [iconButtonData] = React.useState([
         {
             title: 'Reload page',
             disabled: false,

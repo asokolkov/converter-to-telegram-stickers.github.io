@@ -1,10 +1,10 @@
-import React from 'react';
+import React, {useState} from 'react';
 import FileUploader from './FileUploader/FileUploader';
-import KonvaStage from './KonvaStage';
+import KonvaStage from './KonvaStage/KonvaStage';
 import '../styles/EditingBlock.css';
 
 const EditingBlock = () => {
-    const [files, setFiles] = React.useState([]);
+    const [files, setFiles] = useState([]);
 
     const addFiles = (newFiles) => {
         setFiles(files.concat(newFiles));
@@ -13,7 +13,7 @@ const EditingBlock = () => {
     return (
         <div id="EditingBlock">
             <FileUploader addFiles={addFiles} files={files} />
-            { files.length ? <KonvaStage files={files} /> : null }
+            {files.length ? <KonvaStage files={files} /> : null}
         </div>
     );
 };
