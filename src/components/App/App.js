@@ -1,7 +1,7 @@
 import React from "react";
-import "./styles/App.css";
-import EditingBlock from "./components/EditingBlock";
-import ControlBlock from "./components/ControlBlock/ControlBlock";
+import "./App.css";
+import EditingBlock from "../EditingBlock/EditingBlock";
+import ControlBlock from "../ControlBlock/ControlBlock";
 
 function App() {
     return (

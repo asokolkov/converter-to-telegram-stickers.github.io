@@ -1,8 +1,8 @@
-#EditingBlock {
+.editingBlock {
     background-color: #FFF;
     margin-right: 85px;
 }
 
-#EditingBlock:active {
+.editingBlock:active {
     cursor: all-scroll;
 }

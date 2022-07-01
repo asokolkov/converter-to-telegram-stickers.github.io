@@ -2,22 +2,32 @@ import React from 'react';
 import FileBase64 from 'react-file-base64';
 import classes from './FileUploader.module.css';
 
-const FileUploader = ({addFiles, files}) => {
-    const validFormats = ['image/png', 'image/jpg', 'image/jpeg'];
+const FileUploader = ({addImages, images}) => {
+    function toBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
 
-    function tryToAddFiles(files) {
-        addFiles(files.filter(file => validFormats.includes(file.type)));
+    async function onUpload(e) {
+        const files = [];
+        for (let file of e.target.files) files.push(await toBase64(file))
+        addImages(files);
     }
 
     return (
         <label
             className={classes.fileUploader}
-            style={{display: files.length ? "none" : "flex"}}
+            style={{display: images.length ? "none" : "flex"}}
         >
-            <FileBase64
+            <input
                 type="file"
+                accept="image/jpeg,image/png,image/jpg"
+                onChange={onUpload}
                 multiple
-                onDone={(files) => tryToAddFiles(files)}
             />
             <span className={classes.text}>
                 Click to choose images,<br/>drag or paste them here
