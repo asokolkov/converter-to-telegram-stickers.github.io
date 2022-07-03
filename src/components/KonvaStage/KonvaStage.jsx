@@ -1,10 +1,10 @@
 import React, {useContext} from 'react';
 import classes from './KonvaStage.module.css';
 import {Layer, Text, Rect, Image, Transformer, Stage} from 'react-konva';
-import {BackgroundContext} from "../../context";
+import {GlobalContext} from "../../context";
 
 const KonvaStage = ({images}) => {
-    const {color} = useContext(BackgroundContext);
+    const {background} = useContext(GlobalContext);
 
     return (
         <Stage
@@ -18,7 +18,7 @@ const KonvaStage = ({images}) => {
                     y={-1}
                     width={514}
                     height={514}
-                    fill={color}
+                    fill={background.color}
                     listening={false}
                 />
             </Layer>

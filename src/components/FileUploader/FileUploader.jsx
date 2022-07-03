@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import classes from './FileUploader.module.css';
 
 const FileUploader = ({addImages, images}) => {
@@ -18,10 +18,7 @@ const FileUploader = ({addImages, images}) => {
     }
 
     return (
-        <label
-            className={classes.fileUploader}
-            style={{display: images.length ? "none" : "flex"}}
-        >
+        <label className={classes.fileUploader}>
             <input
                 type="file"
                 accept="image/jpeg,image/png,image/jpg"

@@ -1,3 +1,6 @@
 import {createContext} from 'react';
 
-export const BackgroundContext = createContext(null);
+export const GlobalContext = createContext({
+    controlMode: {},
+    background: {}
+});

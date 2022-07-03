@@ -9,52 +9,46 @@ import helpIcon from '../../images/help.svg';
 import reloadIcon from '../../images/reload.svg';
 import nightIcon from '../../images/nightMode.svg';
 
-import {BackgroundContext} from '../../context';
+import {GlobalContext} from '../../context';
 
 const ControlBlock = () => {
-    const {setColor} = useContext(BackgroundContext);
+    const {background} = useContext(GlobalContext);
 
     const [data] = React.useState([
         {
             text: 'Add Text',
             title: 'Click on canvas to add text',
             onClick: null,
-            disabled: false,
             iconPath: textIcon,
         },
         {
             text: 'Change background',
             title: 'Choose canvas background color',
             onClick: null,
-            disabled: false,
             iconPath: bgIcon,
-            colorInput: <ColorInput disabled={false} onInput={(e) => setColor(e.target.value)}/>
+            colorInput: <ColorInput onInput={e => background.setColor(e.target.value)} />
         },
         {
             text: 'Submit',
             title: 'Save image',
             onClick: downloadStage,
-            disabled: false,
         },
         {
             title: 'Reload page',
             style : {right: 0, bottom: 0},
             onClick: null,
-            disabled: false,
             iconPath: reloadIcon,
         },
         {
             title: 'Open site guide',
             style : {right: 65, bottom: 0},
             onClick: null,
-            disabled: false,
             iconPath: helpIcon,
         },
         {
             title: 'Switch dark mode',
             style : {right: 0, bottom: 65},
             onClick: null,
-            disabled: false,
             iconPath: nightIcon,
         },
     ]);

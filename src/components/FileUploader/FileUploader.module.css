@@ -1,4 +1,5 @@
 .fileUploader {
+    display: flex;
     width: 512px;
     height: 512px;
     box-shadow: inset 0 0 0 10px #EF476F;

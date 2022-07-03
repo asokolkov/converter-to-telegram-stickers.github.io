@@ -1,12 +1,15 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import classes from './ColorInput.module.css';
+import {GlobalContext} from "../../../context";
 
-const ColorInput = ({disabled, onChange, onInput}) => {
+const ColorInput = ({onChange, onInput}) => {
+    const {controlMode} = useContext(GlobalContext);
+
     return (
         <input
             className={classes.colorInput}
             type="color"
-            disabled={disabled}
+            disabled={!controlMode.status}
             onChange={onChange}
             onInput={onInput}
         />
