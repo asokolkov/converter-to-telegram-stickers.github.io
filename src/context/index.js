@@ -2,5 +2,7 @@ import {createContext} from 'react';
 
 export const GlobalContext = createContext({
     controlMode: {},
-    background: {}
+    background: {},
+    removeButton: {},
+    stage: {}
 });

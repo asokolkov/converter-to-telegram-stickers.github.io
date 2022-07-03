@@ -1,8 +1,8 @@
 import React, {useContext} from 'react';
 import classes from './ColorInput.module.css';
-import {GlobalContext} from "../../../context";
+import {GlobalContext} from '../../../context';
 
-const ColorInput = ({onChange, onInput}) => {
+const ColorInput = ({onBlur, onInput}) => {
     const {controlMode} = useContext(GlobalContext);
 
     return (
@@ -10,7 +10,7 @@ const ColorInput = ({onChange, onInput}) => {
             className={classes.colorInput}
             type="color"
             disabled={!controlMode.status}
-            onChange={onChange}
+            onBlur={onBlur}
             onInput={onInput}
         />
     );

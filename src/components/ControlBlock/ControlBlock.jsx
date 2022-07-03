@@ -12,7 +12,7 @@ import nightIcon from '../../images/nightMode.svg';
 import {GlobalContext} from '../../context';
 
 const ControlBlock = () => {
-    const {background} = useContext(GlobalContext);
+    const {background, removeButton} = useContext(GlobalContext);
 
     const [data] = React.useState([
         {
@@ -26,7 +26,18 @@ const ControlBlock = () => {
             title: 'Choose canvas background color',
             onClick: null,
             iconPath: bgIcon,
-            colorInput: <ColorInput onInput={e => background.setColor(e.target.value)} />
+            colorInput: <ColorInput
+                onInput={e => background.setColor(e.target.value)}
+                onBlur={() => removeButton.setRemove(true)}
+            />
+        },
+        {
+            text: 'Remove background',
+            title: 'Remove background',
+            onClick: () => {
+                background.setColor(null);
+                removeButton.setRemove(false);
+            },
         },
         {
             text: 'Submit',
@@ -66,11 +77,11 @@ const ControlBlock = () => {
         <div className={classes.controlBlock}>
             <h1 className={classes.h1}>Shitlord's Image Editor</h1>
             <Button data={data[0]} />
-            <Button data={data[1]} />
-            <Button data={data[2]} />
+            {!removeButton.remove ? <Button data={data[1]} /> : <Button data={data[2]} />}
             <Button data={data[3]} />
             <Button data={data[4]} />
             <Button data={data[5]} />
+            <Button data={data[6]} />
         </div>
     );
 };

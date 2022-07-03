@@ -1,16 +1,19 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useRef} from 'react';
 import classes from './KonvaStage.module.css';
 import {Layer, Text, Rect, Image, Transformer, Stage} from 'react-konva';
-import {GlobalContext} from "../../context";
+import {GlobalContext} from '../../context';
 
 const KonvaStage = ({images}) => {
-    const {background} = useContext(GlobalContext);
+    const {background, stage} = useContext(GlobalContext);
+    const stageRef = useRef();
+    useEffect(() => stage.setStage(stageRef), [stageRef]);
 
     return (
         <Stage
             width={512}
             height={512}
             className={classes.stage}
+            ref={stageRef}
         >
             <Layer>
                 <Rect
@@ -21,20 +24,19 @@ const KonvaStage = ({images}) => {
                     fill={background.color}
                     listening={false}
                 />
+                {images.map((image) => (
+                    <Image
+                        image={image.data}
+                        name="image"
+                        draggable
+                        onDragStart={function() {
+                            this.moveToTop();
+                        }}
+                    />
+                ))}
             </Layer>
         </Stage>
     );
 };
-
-{/*{images.map((image) => (*/}
-{/*    <Image*/}
-{/*        image={image}*/}
-{/*        name="image"*/}
-{/*        draggable*/}
-{/*        onDragStart={function() {*/}
-{/*            this.moveToTop();*/}
-{/*        }}*/}
-{/*    />*/}
-{/*))}*/}
 
 export default KonvaStage;
