@@ -1,63 +1,68 @@
-import React , {useContext} from 'react';
+import React, {useContext} from 'react';
 import classes from './ControlBlock.module.css';
-import TextButton from '../UI/TextButton/TextButton';
-import Icon from '../UI/Icon/Icon';
-import IconButton from '../UI/IconButton/IconButton';
+import Button from '../UI/Button/Button';
+import ColorInput from '../UI/ColorInput/ColorInput';
+
 import textIcon from '../../images/text.svg';
 import bgIcon from '../../images/bg.svg';
 import helpIcon from '../../images/help.svg';
 import reloadIcon from '../../images/reload.svg';
 import nightIcon from '../../images/nightMode.svg';
 
-const ControlBlock = ({stageRef}) => {
+import {BackgroundContext} from '../../context';
+
+const ControlBlock = () => {
+    const {setColor} = useContext(BackgroundContext);
+
     const [data] = React.useState([
         {
             text: 'Add Text',
             title: 'Click on canvas to add text',
-            disabled: false,
             onClick: null,
-            Icon: <Icon path={textIcon} />
+            disabled: false,
+            iconPath: textIcon,
         },
         {
             text: 'Change background',
             title: 'Choose canvas background color',
-            disabled: false,
             onClick: null,
-            Icon: <Icon path={bgIcon} />,
-            ColorInput: true
+            disabled: false,
+            iconPath: bgIcon,
+            colorInput: <ColorInput disabled={false} onInput={(e) => setColor(e.target.value)}/>
         },
         {
             text: 'Submit',
             title: 'Save image',
-            disabled: false,
             onClick: downloadStage,
+            disabled: false,
         },
-    ]);
-    const [iconButtonData] = React.useState([
         {
             title: 'Reload page',
-            disabled: false,
+            style : {right: 0, bottom: 0},
             onClick: null,
-            iconPath: reloadIcon
+            disabled: false,
+            iconPath: reloadIcon,
         },
         {
             title: 'Open site guide',
-            disabled: false,
+            style : {right: 65, bottom: 0},
             onClick: null,
-            iconPath: helpIcon
+            disabled: false,
+            iconPath: helpIcon,
         },
         {
             title: 'Switch dark mode',
-            disabled: false,
+            style : {right: 0, bottom: 65},
             onClick: null,
-            iconPath: nightIcon
+            disabled: false,
+            iconPath: nightIcon,
         },
     ]);
 
     function downloadStage() {
         const link = document.createElement('a');
         link.download = 'image500x500.png';
-        link.href = stageRef.current.toDataURL();
+        //link.href = stageRef.current.toDataURL();
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -66,12 +71,12 @@ const ControlBlock = ({stageRef}) => {
     return (
         <div className={classes.controlBlock}>
             <h1 className={classes.h1}>Shitlord's Image Editor</h1>
-            <TextButton data={data[0]} />
-            <TextButton data={data[1]} />
-            <TextButton data={data[2]} />
-            <IconButton data={iconButtonData[0]} shift={{right: 0, bottom: 0}}/>
-            <IconButton data={iconButtonData[1]} shift={{right: 65, bottom: 0}}/>
-            <IconButton data={iconButtonData[2]} shift={{right: 0, bottom: 65}}/>
+            <Button data={data[0]} />
+            <Button data={data[1]} />
+            <Button data={data[2]} />
+            <Button data={data[3]} />
+            <Button data={data[4]} />
+            <Button data={data[5]} />
         </div>
     );
 };

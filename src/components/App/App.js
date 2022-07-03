@@ -1,16 +1,19 @@
-import React, {useRef} from "react";
+import React, {useState} from "react";
 import "./App.css";
 import EditingBlock from "../EditingBlock/EditingBlock";
 import ControlBlock from "../ControlBlock/ControlBlock";
+import {BackgroundContext} from "../../context";
 
 function App() {
-    const stageRef = useRef(null);
+    const [color, setColor] = useState(null);
 
     return (
-        <div id="App">
-            <EditingBlock stageRef={stageRef} />
-            <ControlBlock stageRef={stageRef} />
-        </div>
+        <BackgroundContext.Provider value={{color, setColor}}>
+            <div id="App">
+                <EditingBlock />
+                <ControlBlock />
+            </div>
+        </BackgroundContext.Provider>
     );
 }
 

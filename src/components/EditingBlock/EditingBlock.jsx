@@ -1,19 +1,23 @@
-import React, {useContext, useEffect, useRef, useState} from 'react';
+import React, {useState} from 'react';
 import FileUploader from '../FileUploader/FileUploader';
 import KonvaStage from '../KonvaStage/KonvaStage';
 import classes from './EditingBlock.module.css';
 
-const EditingBlock = ({stageRef}) => {
+const EditingBlock = () => {
+    let imagesCounter = 0;
     const [images, setImages] = useState([]);
-
-    setInterval(() => console.log(stageRef), 2000)
 
     const addImages = (base64Images) => {
         const newImages = [];
         base64Images.forEach(file => {
             const image = document.createElement('img');
             image.src = file;
-            newImages.push(image);
+            newImages.push({
+                id: (++imagesCounter).toString(),
+                data: image,
+                x: 0,
+                y: 0
+            });
         });
         setImages(images.concat(newImages));
     };
@@ -21,7 +25,7 @@ const EditingBlock = ({stageRef}) => {
     return (
         <div className={classes.editingBlock}>
             <FileUploader addImages={addImages} images={images} />
-            {images.length ? <KonvaStage images={images} stageRef={stageRef} /> : null}
+            {images.length ? <KonvaStage images={images} /> : null}
         </div>
     );
 };
