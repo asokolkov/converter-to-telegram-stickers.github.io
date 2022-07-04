@@ -9,11 +9,15 @@ const KonvaStage = ({images}) => {
     const stageRef = useRef();
     useEffect(() => stage.setStage(stageRef.current), [stageRef]);
 
-    const [selectedId, setSelectedId] = React.useState(null);
+    const [selectedElement, setSelectedElement] = React.useState({});
 
     function checkDeselect(e) {
         const clickedOnEmpty = e.target === e.target.getStage();
-        if (clickedOnEmpty) setSelectedId(null);
+        if (clickedOnEmpty) setSelectedElement({});
+    }
+
+    function trySelect(image) {
+        setSelectedElement(image !== selectedElement ? image : {});
     }
 
     return (
@@ -37,9 +41,10 @@ const KonvaStage = ({images}) => {
                 {images.map((image) => (
                     <KonvaImage
                         key={image.id}
-                        image={image}
-                        isSelected={image.id === selectedId}
-                        onClick={() => setSelectedId(image.id)}
+                        image={image.data}
+                        isSelected={image.id === selectedElement.id}
+                        onClick={() => trySelect(image)}
+                        onDragStart={() => trySelect(image)}
                     />
                 ))}
             </Layer>

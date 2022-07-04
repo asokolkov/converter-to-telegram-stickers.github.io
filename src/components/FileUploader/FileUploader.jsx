@@ -1,16 +1,16 @@
 import React, {useContext} from 'react';
 import classes from './FileUploader.module.css';
 
-const FileUploader = ({addImages, images}) => {
-    function toBase64(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
-        });
-    }
+function toBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}
 
+const FileUploader = ({addImages, images}) => {
     async function onUpload(e) {
         const files = [];
         for (let file of e.target.files) files.push(await toBase64(file))

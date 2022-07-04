@@ -2,6 +2,7 @@ import React, {useContext} from 'react';
 import classes from './ControlBlock.module.css';
 import Button from '../UI/Button/Button';
 import ColorInput from '../UI/ColorInput/ColorInput';
+import {GlobalContext} from '../../context';
 
 import textIcon from '../../images/text.svg';
 import bgIcon from '../../images/bg.svg';
@@ -9,7 +10,14 @@ import helpIcon from '../../images/help.svg';
 import reloadIcon from '../../images/reload.svg';
 import nightIcon from '../../images/nightMode.svg';
 
-import {GlobalContext} from '../../context';
+function downloadStage(stage) {
+    const link = document.createElement('a');
+    link.download = 'image500x500.png';
+    link.href = stage.stage.toDataURL();
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
 
 const ControlBlock = () => {
     const {background, removeButton, stage} = useContext(GlobalContext);
@@ -42,7 +50,7 @@ const ControlBlock = () => {
         {
             text: 'Submit',
             title: 'Save image',
-            onClick: downloadStage,
+            onClick: () => downloadStage(stage),
         },
         {
             title: 'Reload page',
@@ -65,15 +73,6 @@ const ControlBlock = () => {
             disabled: false
         },
     ];
-
-    function downloadStage() {
-        const link = document.createElement('a');
-        link.download = 'image500x500.png';
-        link.href = stage.stage.toDataURL();
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
 
     return (
         <div className={classes.controlBlock}>

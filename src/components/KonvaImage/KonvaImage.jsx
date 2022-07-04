@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {Image, Transformer} from "react-konva";
 
-const KonvaImage = ({image, isSelected, onClick}) => {
+const KonvaImage = ({image, isSelected, onClick, onDragStart}) => {
     const shapeRef = React.useRef();
     const transformRef = React.useRef();
 
@@ -16,11 +16,12 @@ const KonvaImage = ({image, isSelected, onClick}) => {
     return (
         <React.Fragment>
             <Image
-                image={image.data}
+                image={image}
                 name="image"
                 draggable
                 onClick={onClick}
                 onTap={onClick}
+                onDragStart={onDragStart}
                 ref={shapeRef}
             />
             {isSelected && (
