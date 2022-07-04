@@ -5,12 +5,14 @@ import {GlobalContext} from '../../../context';
 
 const Button = ({data}) => {
     const {controlMode} = useContext(GlobalContext);
+
     const requiredButtonClass = data.text === 'Submit'
         ? classes.submit
         : data.text
             ? classes.button
             : classes.iconButton;
-    const requiredDisabledClass = !controlMode.status ? classes.disabled : '';
+    const disabled = data.disabled ?? !controlMode.status;
+    const requiredDisabledClass = disabled ? classes.disabled : '';
 
     return (
         <button
@@ -18,7 +20,7 @@ const Button = ({data}) => {
             className={`${requiredButtonClass} ${requiredDisabledClass}`}
             title={data.title}
             onClick={data.onClick}
-            disabled={!controlMode.status}
+            disabled={disabled}
         >
             {
                 data.iconPath

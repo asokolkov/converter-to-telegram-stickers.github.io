@@ -4,5 +4,5 @@ export const GlobalContext = createContext({
     controlMode: {},
     background: {},
     removeButton: {},
-    stage: {}
+    stage: {},
 });

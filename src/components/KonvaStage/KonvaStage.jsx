@@ -6,7 +6,7 @@ import {GlobalContext} from '../../context';
 const KonvaStage = ({images}) => {
     const {background, stage} = useContext(GlobalContext);
     const stageRef = useRef();
-    useEffect(() => stage.setStage(stageRef), [stageRef]);
+    useEffect(() => stage.setStage(stageRef.current), [stageRef]);
 
     return (
         <Stage

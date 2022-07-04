@@ -12,9 +12,9 @@ import nightIcon from '../../images/nightMode.svg';
 import {GlobalContext} from '../../context';
 
 const ControlBlock = () => {
-    const {background, removeButton} = useContext(GlobalContext);
+    const {background, removeButton, stage} = useContext(GlobalContext);
 
-    const [data] = React.useState([
+    const data = [
         {
             text: 'Add Text',
             title: 'Click on canvas to add text',
@@ -55,19 +55,21 @@ const ControlBlock = () => {
             style : {right: 65, bottom: 0},
             onClick: null,
             iconPath: helpIcon,
+            disabled: false
         },
         {
             title: 'Switch dark mode',
             style : {right: 0, bottom: 65},
             onClick: null,
             iconPath: nightIcon,
+            disabled: false
         },
-    ]);
+    ];
 
     function downloadStage() {
         const link = document.createElement('a');
         link.download = 'image500x500.png';
-        //link.href = stageRef.current.toDataURL();
+        link.href = stage.stage.toDataURL();
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

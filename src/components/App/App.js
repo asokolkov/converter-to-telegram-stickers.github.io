@@ -16,7 +16,7 @@ function App() {
                 controlMode: {status, setStatus},
                 removeButton: {remove, setRemove},
                 background: {color, setColor},
-                stage: {stage, setStage}
+                stage: {stage, setStage},
             }}
         >
             <div id="App">
