@@ -36,6 +36,7 @@ const KonvaStage = ({images}) => {
                 />
                 {images.map((image) => (
                     <KonvaImage
+                        key={image.id}
                         image={image}
                         isSelected={image.id === selectedId}
                         onClick={() => setSelectedId(image.id)}
