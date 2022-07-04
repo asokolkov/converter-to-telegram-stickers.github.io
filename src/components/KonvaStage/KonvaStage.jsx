@@ -1,12 +1,20 @@
 import React, {useContext, useEffect, useRef} from 'react';
 import classes from './KonvaStage.module.css';
-import {Layer, Text, Rect, Image, Transformer, Stage} from 'react-konva';
+import {Layer, Text, Rect, Stage} from 'react-konva';
 import {GlobalContext} from '../../context';
+import KonvaImage from "../KonvaImage/KonvaImage";
 
 const KonvaStage = ({images}) => {
     const {background, stage} = useContext(GlobalContext);
     const stageRef = useRef();
     useEffect(() => stage.setStage(stageRef.current), [stageRef]);
+
+    const [selectedId, setSelectedId] = React.useState(null);
+
+    function checkDeselect(e) {
+        const clickedOnEmpty = e.target === e.target.getStage();
+        if (clickedOnEmpty) setSelectedId(null);
+    }
 
     return (
         <Stage
@@ -14,6 +22,8 @@ const KonvaStage = ({images}) => {
             height={512}
             className={classes.stage}
             ref={stageRef}
+            onMouseDown={checkDeselect}
+            onTouchStart={checkDeselect}
         >
             <Layer>
                 <Rect
@@ -25,13 +35,10 @@ const KonvaStage = ({images}) => {
                     listening={false}
                 />
                 {images.map((image) => (
-                    <Image
-                        image={image.data}
-                        name="image"
-                        draggable
-                        onDragStart={function() {
-                            this.moveToTop();
-                        }}
+                    <KonvaImage
+                        image={image}
+                        isSelected={image.id === selectedId}
+                        onClick={() => setSelectedId(image.id)}
                     />
                 ))}
             </Layer>

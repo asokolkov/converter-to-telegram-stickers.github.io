@@ -19,9 +19,7 @@ const EditingBlock = () => {
             image.src = file;
             newImages.push({
                 id: (++imagesCounter).toString(),
-                data: image,
-                x: 0,
-                y: 0
+                data: image
             });
         });
         setImages(images.concat(newImages));
