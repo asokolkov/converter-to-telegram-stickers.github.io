@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import classes from './ColorInput.module.css';
-import {GlobalContext} from '../../../context';
+import {GlobalContext} from '../../context';
 
 const ColorInput = ({onBlur, onInput}) => {
     const {controlMode} = useContext(GlobalContext);

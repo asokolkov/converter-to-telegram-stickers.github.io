@@ -7,10 +7,6 @@ body {
     transition: .3s;
 }
 
-#root {
-    margin: auto;
-}
-
-#App {
+.app {
     display: flex;
 }

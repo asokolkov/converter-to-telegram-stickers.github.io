@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import classes from './ControlBlock.module.css';
-import Button from '../UI/Button/Button';
-import ColorInput from '../UI/ColorInput/ColorInput';
+import Button from './Button';
+import ColorInput from './ColorInput';
 import {GlobalContext} from '../../context';
 
 import textIcon from '../../images/text.svg';
@@ -30,24 +30,6 @@ const ControlBlock = () => {
             iconPath: textIcon,
         },
         {
-            text: 'Change background',
-            title: 'Choose canvas background color',
-            onClick: null,
-            iconPath: bgIcon,
-            colorInput: <ColorInput
-                onInput={e => background.setColor(e.target.value)}
-                onBlur={() => removeButton.setRemove(true)}
-            />
-        },
-        {
-            text: 'Remove background',
-            title: 'Remove background',
-            onClick: () => {
-                background.setColor(null);
-                removeButton.setRemove(false);
-            },
-        },
-        {
             text: 'Submit',
             title: 'Save image',
             onClick: () => downloadStage(stage),
@@ -55,7 +37,7 @@ const ControlBlock = () => {
         {
             title: 'Reload page',
             style : {right: 0, bottom: 0},
-            onClick: null,
+            onClick: () => document.location.reload(),
             iconPath: reloadIcon,
         },
         {
@@ -72,17 +54,46 @@ const ControlBlock = () => {
             iconPath: nightIcon,
             disabled: false
         },
+        {
+            text: 'Undo',
+            onClick: () => {
+            },
+        },
+        {
+            text: 'Redo',
+            onClick: () => {
+            },
+        },
+    ];
+
+    const bg = [
+        {
+            text: 'Change background',
+            title: 'Choose canvas background color',
+            onClick: null,
+            iconPath: bgIcon,
+            colorInput: <ColorInput
+                onInput={e => background.setColor(e.target.value)}
+                onBlur={() => removeButton.setRemove(true)}
+            />
+        },
+        {
+            text: 'Remove background',
+            title: 'Remove background',
+            onClick: () => {
+                background.setColor(null);
+                removeButton.setRemove(false);
+            },
+        }
     ];
 
     return (
         <div className={classes.controlBlock}>
             <h1 className={classes.h1}>Shitlord's Image Editor</h1>
-            <Button data={data[0]} />
-            {!removeButton.remove ? <Button data={data[1]} /> : <Button data={data[2]} />}
-            <Button data={data[3]} />
-            <Button data={data[4]} />
-            <Button data={data[5]} />
-            <Button data={data[6]} />
+            {!removeButton.remove ? <Button data={bg[0]} /> : <Button data={bg[1]} />}
+            {data.map(button => {
+                return (<Button data={button} />);
+            })}
         </div>
     );
 };

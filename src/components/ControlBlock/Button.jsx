@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import classes from './Button.module.css';
-import Icon from '../Icon/Icon';
-import {GlobalContext} from '../../../context';
+import Icon from './Icon';
+import {GlobalContext} from '../../context';
 
 const Button = ({data}) => {
     const {controlMode} = useContext(GlobalContext);

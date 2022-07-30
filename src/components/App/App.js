@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import './App.css';
+import classes from './App.module.css';
 import EditingBlock from '../EditingBlock/EditingBlock';
 import ControlBlock from '../ControlBlock/ControlBlock';
 import {GlobalContext} from '../../context';
@@ -9,6 +9,7 @@ function App() {
     const [status, setStatus] = useState(false);
     const [remove, setRemove] = useState(false);
     const [stage, setStage] = useState(null);
+    const [history, setHistory] = useState([]);
 
     return (
         <GlobalContext.Provider
@@ -17,9 +18,10 @@ function App() {
                 removeButton: {remove, setRemove},
                 background: {color, setColor},
                 stage: {stage, setStage},
+                history: {history, setHistory},
             }}
         >
-            <div id="App">
+            <div className={classes.app}>
                 <EditingBlock />
                 <ControlBlock />
             </div>

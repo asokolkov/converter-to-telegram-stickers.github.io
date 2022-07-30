@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React from 'react';
 import classes from './FileUploader.module.css';
 
 function toBase64(file) {

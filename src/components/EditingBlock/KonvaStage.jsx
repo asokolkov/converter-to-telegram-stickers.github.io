@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useRef} from 'react';
 import classes from './KonvaStage.module.css';
 import {Layer, Text, Rect, Stage} from 'react-konva';
 import {GlobalContext} from '../../context';
-import KonvaImage from "../KonvaImage/KonvaImage";
+import KonvaImage from "./KonvaImage";
 
 const KonvaStage = ({images}) => {
     const {background, stage} = useContext(GlobalContext);
