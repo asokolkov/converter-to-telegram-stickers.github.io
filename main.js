@@ -168,56 +168,56 @@ layer.on('dragmove', e => {
 layer.on('dragend', () => removeLines());
 
 
-inputImage.onchange = function() {
-    addFiles(this.files);
-};
-
-inputLabel.ondrop = function(e) {
-    e.preventDefault();
-    addFiles(e.dataTransfer.files);
-};
-
-document.onpaste = function(e){
+document.addEventListener('paste', e => {
     const files = Object.values(e.clipboardData.items)
         .filter(element => element.kind === 'file')
         .map((element) => element.getAsFile());
     addFiles(files);
-};
+});
 
-inputLabel.ondragover = function(e) {
+canvas.addEventListener('dragover', function(e) {
     e.preventDefault();
     this.classList.add('dragover');
-};
+});
 
-inputLabel.ondragleave = function(e) {
+canvas.addEventListener('dragleave', function(e) {
     e.preventDefault();
     this.classList.remove('dragover');
-};
+});
 
-canvas.ondragover = function(e) {
-    e.preventDefault();
-    this.classList.add('dragover');
-};
-
-canvas.ondragleave = function(e) {
-    e.preventDefault();
-    this.classList.remove('dragover');
-};
-
-canvas.ondrop = function(e) {
+canvas.addEventListener('drop', function(e) {
     e.preventDefault();
     addFiles(e.dataTransfer.files);
     this.classList.remove('dragover');
-};
+});
 
-inputColor.oninput = function(e) {
+inputLabel.addEventListener('drop', function(e) {
+    e.preventDefault();
+    addFiles(e.dataTransfer.files);
+});
+
+inputLabel.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    this.classList.add('dragover');
+});
+
+inputLabel.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    this.classList.remove('dragover');
+});
+
+inputImage.addEventListener('change', function() {
+    addFiles(this.files);
+});
+
+inputColor.addEventListener('input', function(e) {
     background.fill(e.target.value);
-};
+});
 
-inputColor.onchange = function() {
+inputColor.addEventListener('change', function() {
     inputAddBG.style.display = 'none';
     inputRemoveBG.style.display = 'flex';
-};
+});
 
 
 function removeBG() {
