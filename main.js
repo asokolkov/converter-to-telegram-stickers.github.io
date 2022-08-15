@@ -8,21 +8,14 @@ Konva.Context.prototype.fillStrokeShape = function(shape) {
 };
 
 
-class EditingBlock {
-    constructor() {
-        this.elements = {
-            inputImageBlock: document.getElementById('input-image-block'),
-            inputImage: document.getElementById('input-image'),
-            canvas: document.getElementById('canvas')
-        };
-    }
-}
-
-
 const size = 512;
 let imageData = '';
+let freeClicks = 1;
 
 
+const inputImageBlock = document.getElementById('input-image-block');
+const inputImage = document.getElementById('input-image');
+const canvas = document.getElementById('canvas');
 const inputColor = document.getElementById('input-color');
 const inputAddBG = document.getElementById('change-bg-add');
 const inputRemoveBG = document.getElementById('change-bg-remove');
@@ -31,8 +24,8 @@ const inputText = document.getElementById('text-input');
 
 const stage = new Konva.Stage({
     container: 'canvas',
-    width: size,
-    height: size
+    width: 512,
+    height: 512
 });
 
 const layer = new Konva.Layer();
@@ -41,17 +34,17 @@ stage.add(layer);
 const background = new Konva.Rect({
     x: -1,
     y: -1,
-    width: stageWidth + 1,
-    height: stageHeight + 1,
+    width: size + 1,
+    height: size + 1,
     listening: false
 });
 layer.add(background);
 
 const tr = new Konva.Transformer({
-    anchorStroke: 'red',
-    anchorFill: 'yellow',
+    anchorStroke: '#FFF',
+    anchorFill: '#00A1FFFF',
     anchorSize: 20,
-    borderStroke: 'green',
+    borderStroke: '#00A1FFFF',
     borderDash: [3, 3],
     rotationSnaps: [0, 45, 90, 135, 180, 225, 270, 315]
 });
@@ -115,6 +108,7 @@ stage.on('mouseleave mouseup touchend', e => {
 stage.on('click tap', e => selectElementEvent(e));
 
 layer.on('dragstart', function () {
+    tr.moveToTop();
     stage.find('.text').forEach(text => text.moveToTop());
 });
 
@@ -337,7 +331,7 @@ function getPossibleLines(linesPositions, elementBounds) {
 function drawLines(lines) {
     lines.forEach(guideline => {
         const line = new Konva.Line({
-            stroke: 'rgb(0, 161, 255)',
+            stroke: '#00A1FFFF',
             strokeWidth: 1,
             name: 'guideline',
             dash: [4, 6]
@@ -417,10 +411,6 @@ function onSubmitClick() {
     download('image512x512.png');
 }
 
-function onHelpClick() {
-
-}
-
 function addTextEvent(button) {
     const position = stage.getRelativePointerPosition();
     const text = new Konva.Text({
@@ -454,8 +444,6 @@ function activateAddingTextCondition(button) {
     stage.off('click tap');
     stage.on('click tap', () => addTextEvent(button));
 }
-
-let freeClicks = 1;
 
 function deactivateAddingTextCondition(button, text) {
     if (freeClicks--) return;
