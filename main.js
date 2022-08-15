@@ -1,26 +1,38 @@
-const canvas = document.getElementById('canvas');
-const inputImage = document.getElementById('input');
-const inputLabel = document.getElementById('input-label');
+const originalFillStroke = Konva.Context.prototype.fillStrokeShape;
+Konva.Context.prototype.fillStrokeShape = function(shape) {
+    if (shape instanceof Konva.Text) {
+        if (shape.getStrokeEnabled()) this._stroke(shape);
+        if (shape.getFillEnabled()) this._fill(shape);
+    }
+    else originalFillStroke.call(this, shape);
+};
+
+
+class EditingBlock {
+    constructor() {
+        this.elements = {
+            inputImageBlock: document.getElementById('input-image-block'),
+            inputImage: document.getElementById('input-image'),
+            canvas: document.getElementById('canvas')
+        };
+    }
+}
+
+
+const size = 512;
+let imageData = '';
+
+
 const inputColor = document.getElementById('input-color');
 const inputAddBG = document.getElementById('change-bg-add');
 const inputRemoveBG = document.getElementById('change-bg-remove');
 const inputText = document.getElementById('text-input');
 
 
-const stageWidth = 512;
-const stageHeight = 512;
-let imageData = '';
-const anchorAxes = new Set();
-anchorAxes.add({axis: 'x', position: 0});
-anchorAxes.add({axis: 'y', position: 0});
-anchorAxes.add({axis: 'x', position: stageWidth});
-anchorAxes.add({axis: 'x', position: stageHeight});
-
-
 const stage = new Konva.Stage({
     container: 'canvas',
-    width: 512,
-    height: 512
+    width: size,
+    height: size
 });
 
 const layer = new Konva.Layer();
@@ -44,15 +56,6 @@ const tr = new Konva.Transformer({
     rotationSnaps: [0, 45, 90, 135, 180, 225, 270, 315]
 });
 layer.add(tr);
-
-const originalFillStroke = Konva.Context.prototype.fillStrokeShape;
-Konva.Context.prototype.fillStrokeShape = function(shape) {
-    if (shape instanceof Konva.Text) {
-        if (shape.getStrokeEnabled()) this._stroke(shape);
-        if (shape.getFillEnabled()) this._fill(shape);
-    }
-    else originalFillStroke.call(this, shape);
-};
 
 const selection = {
     element: new Konva.Rect({
@@ -110,26 +113,6 @@ stage.on('mouseleave mouseup touchend', e => {
 });
 
 stage.on('click tap', e => selectElementEvent(e));
-
-function selectElementEvent(e) {
-    if (selection.element.visible()) return;
-
-    const element = e.target;
-
-    if (element === stage) {
-        tr.nodes([]);
-        return;
-    }
-
-    if (!element.hasName('element') && !element.hasName('text')) return;
-
-    const ctrlPressed = e.evt.ctrlKey;
-    const isSelected = tr.nodes().includes(element);
-
-    if (!ctrlPressed && !isSelected) tr.nodes([element]);
-    if (ctrlPressed && !isSelected) addToNodes(element);
-    if ((!ctrlPressed && isSelected) || (ctrlPressed && isSelected)) removeFromNodes(element);
-}
 
 layer.on('dragstart', function () {
     stage.find('.text').forEach(text => text.moveToTop());
@@ -191,17 +174,17 @@ canvas.addEventListener('drop', function(e) {
     this.classList.remove('dragover');
 });
 
-inputLabel.addEventListener('drop', function(e) {
+inputImageBlock.addEventListener('drop', function(e) {
     e.preventDefault();
     addFiles(e.dataTransfer.files);
 });
 
-inputLabel.addEventListener('dragover', function(e) {
+inputImageBlock.addEventListener('dragover', function(e) {
     e.preventDefault();
     this.classList.add('dragover');
 });
 
-inputLabel.addEventListener('dragleave', function(e) {
+inputImageBlock.addEventListener('dragleave', function(e) {
     e.preventDefault();
     this.classList.remove('dragover');
 });
@@ -220,6 +203,26 @@ inputColor.addEventListener('change', function() {
 });
 
 
+function selectElementEvent(e) {
+    if (selection.element.visible()) return;
+
+    const element = e.target;
+
+    if (element === stage) {
+        tr.nodes([]);
+        return;
+    }
+
+    if (!element.hasName('element') && !element.hasName('text')) return;
+
+    const ctrlPressed = e.evt.ctrlKey;
+    const isSelected = tr.nodes().includes(element);
+
+    if (!ctrlPressed && !isSelected) tr.nodes([element]);
+    if (ctrlPressed && !isSelected) addToNodes(element);
+    if ((!ctrlPressed && isSelected) || (ctrlPressed && isSelected)) removeFromNodes(element);
+}
+
 function removeBG() {
     inputAddBG.style.display = 'flex';
     inputRemoveBG.style.display = 'none';
@@ -227,8 +230,8 @@ function removeBG() {
 }
 
 function getLinesPositions(skippableElement) {
-    const verticalPositions = [0, stageWidth / 2, stageWidth];
-    const horizontalPositions = [0, stageHeight / 2, stageHeight];
+    const verticalPositions = [0, size / 2, size];
+    const horizontalPositions = [0, size / 2, size];
 
     stage.find('.element').forEach(element => {
         if (element === skippableElement) return;
@@ -367,7 +370,7 @@ function addFiles(files) {
     if (!Array.isArray(files)) files = Object.values(files);
     files.forEach(file => addImage(file));
 
-    inputLabel.style.display = 'none';
+    inputImageBlock.style.display = 'none';
     canvas.style.display = 'flex';
     for (const element of [...document.getElementsByClassName('disabled')]) {
         element.classList.remove('disabled');
