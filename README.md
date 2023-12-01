@@ -1,5 +1,7 @@
 # Shitlord's Image Editor
 
+Этот сервис предназначен для создания стикеров в Telegram.
+
 ## [Рабочий сайт](https://shitlords-image-editor.vercel.app/)
 
 ## TODO
